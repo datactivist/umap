@@ -5,7 +5,7 @@ export class Importer {
   constructor(map, options) {
     this.name = options.name || 'Datasets'
     this.choices = options?.choices
-    this.id = 'datasets'
+    this.id = this.name.toLowerCase().replace(/\s+/g, '-')
   }
 
   async open(importer) {

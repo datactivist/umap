@@ -77,7 +77,7 @@ export default class Importer extends Utils.WithTemplate {
       const register = (mod) => {
         this.IMPORTERS.push(new mod.Importer(this._umap, config))
       }
-      // We need to have explicit static paths for Django's collectstatic with hashes.
+
       switch (name) {
         case 'geodatamine':
           import('./importers/geodatamine.js').then(register)
@@ -91,14 +91,17 @@ export default class Importer extends Utils.WithTemplate {
         case 'overpass':
           import('./importers/overpass.js').then(register)
           break
-        case 'datasets':
-          import('./importers/datasets.js').then(register)
-          break
         case 'banfr':
           import('./importers/banfr.js').then(register)
           break
         case 'opendata':
           import('./importers/opendata.js').then(register)
+          break
+        default:
+          // Handle groups by pattern
+          if (/^datasets/.test(name)) {
+            import('./importers/datasets.js').then(register)
+          }
           break
       }
     }

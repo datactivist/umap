@@ -9,7 +9,9 @@ import TemplateImporter from '../templates.js'
 const TOP_BAR_TEMPLATE = `
 <div class="umap-main-edit-toolbox with-transition dark">
     <div class="umap-left-edit-toolbox" data-ref="left">
-        <div class="logo"><a class="" href="/" title="${translate('Go to the homepage')}">uMap</a></div>
+        <div class="logo"><a class="" href="/" title="${translate(
+          'Go to the homepage'
+        )}">uMap</a></div>
         <button class="map-name flat truncate" type="button" data-ref="name"></button>
         <button class="share-status flat truncate" type="button" data-ref="share"></button>
         <button class="edit-undo round flat" type="button" data-ref="undo" disabled>
@@ -28,7 +30,12 @@ const TOP_BAR_TEMPLATE = `
           <i class="icon icon-16 icon-profile"></i>
           <span class="username truncate" data-ref="username"></span>
         </button>
-        <button class="umap-help-link flat" type="button" title="${translate('Help')}" data-ref="help">${translate('Help')}</button>
+        <button class="umap-help-link flat" type="button" title="${translate(
+          'Help'
+        )}" data-ref="help">${translate('Help')}</button>
+        <button type=button class="importers" data-ref="importersButton"><i class="icon icon-16 icon-magic"></i>${translate(
+          'Import helpers'
+        )}</button>
         <button class="edit-disable round disabled-on-dirty" type="button" data-ref="view">
             <i class="icon icon-16 icon-eye"></i>
             <span>${translate('View')}</span>
@@ -38,7 +45,9 @@ const TOP_BAR_TEMPLATE = `
             <i class="icon icon-16 icon-save-disabled"></i>
             <span hidden data-ref="saveLabel">${translate('Save')}</span>
             <span hidden data-ref="saveDraftLabel">${translate('Save draft')}</span>
-            <span hidden data-ref="saveTemplateLabel">${translate('Save template')}</span>
+            <span hidden data-ref="saveTemplateLabel">${translate(
+              'Save template'
+            )}</span>
         </button>
     </div>
 </div>`
@@ -122,6 +131,10 @@ export class TopBar extends WithTemplate {
     })
 
     this.elements.help.addEventListener('click', () => this._umap.help.showGetStarted())
+    this.elements.importersButton.addEventListener('click', () => {
+      this._umap.importer.open()
+      this._umap.importer.showImporters()
+    })
     this.elements.redo.addEventListener('click', () => this._umap.redo())
     this.elements.undo.addEventListener('click', () => this._umap.undo())
     this.elements.undo.addEventListener('mouseover', () => {
@@ -259,22 +272,45 @@ const EDIT_BAR_TEMPLATE = `
     <li data-ref="marker"><button type="button" data-getstarted><i class="icon icon-24 icon-marker"></i></button></li>
     <li data-ref="polyline"><button type="button" data-getstarted><i class="icon icon-24 icon-polyline"></i></button></li>
     <li data-ref="multiline" hidden>
-      <button type="button" title="${translate('Add a line to the current multi')}"><i class="icon icon-24 icon-multiline"></i></button>
+      <button type="button" title="${translate(
+        'Add a line to the current multi'
+      )}"><i class="icon icon-24 icon-multiline"></i></button>
     </li>
     <li data-ref="polygon"><button type="button" data-getstarted><i class="icon icon-24 icon-polygon"></i></button></li>
     <li data-ref="multipolygon" hidden>
-      <button type="button" title="${translate('Add a polygon to the current multi')}"><i class="icon icon-24 icon-multipolygon"></i></button>
+      <button type="button" title="${translate(
+        'Add a polygon to the current multi'
+      )}"><i class="icon icon-24 icon-multipolygon"></i></button>
     </li>
-    <li data-ref="route" hidden><button type="button" data-getstarted title="${translate('Draw along routes')}"><i class="icon icon-24 icon-route"></i></button></li>
+    <li data-ref="route" hidden><button type="button" data-getstarted title="${translate(
+      'Draw along routes'
+    )}"><i class="icon icon-24 icon-route"></i></button></li>
     <hr>
-    <li data-ref="caption" hidden><button data-getstarted type="button" title="${translate('Edit map name and caption')}"><i class="icon icon-24 icon-caption"></i></button></li>
+    <li data-ref="caption" hidden><button data-getstarted type="button" title="${translate(
+      'Edit map name and caption'
+    )}"><i class="icon icon-24 icon-caption"></i></button></li>
     <li data-ref="import" hidden><button type="button"><i class="icon icon-24 icon-upload"></i></button></li>
-    <li data-ref="templates" hidden><button type="button" title="${translate('Load template')}" data-getstarted><i class="icon icon-24 icon-template"></i></button></li>
-    <li data-ref="layers" hidden><button type="button" title="${translate('Manage layers')}"><i class="icon icon-24 icon-layers"></i></button></li>
-    <li data-ref="tilelayers" hidden><button type="button" title="${translate('Change tilelayers')}"><i class="icon icon-24 icon-tilelayer"></i></button></li>
+    <li data-ref="templates" hidden><button type="button" title="${translate(
+      'Load template'
+    )}" data-getstarted><i class="icon icon-24 icon-template"></i></button></li>
+    <li data-ref="layers" hidden><button type="button" title="${translate(
+      'Manage layers'
+    )}"><i class="icon icon-24 icon-layers"></i></button></li>
+    <li data-ref="tilelayers" hidden><button type="button" title="${translate(
+      'Change tilelayers'
+    )}"><i class="icon icon-24 icon-tilelayer"></i></button></li>
     <li data-ref="center" hidden><button type="button"><i class="icon icon-24 icon-center"></i></button></li>
-    <li data-ref="permissions" hidden><button type="button" title="${translate('Update permissions and editors')}"><i class="icon icon-24 icon-key"></i></button></li>
-    <li data-ref="settings" hidden><button data-getstarted type="button" title="${translate('Map advanced properties')}"><i class="icon icon-24 icon-settings"></i></button></li>
+    <li data-ref="permissions" hidden><button type="button" title="${translate(
+      'Update permissions and editors'
+    )}"><i class="icon icon-24 icon-key"></i></button></li>
+    <li data-ref="rules" hidden>
+      <button type="button" title="${translate('Conditional style rules')}">
+        <i class="icon icon-24 icon-rules"></i>
+      </button>
+    </li>
+    <li data-ref="settings" hidden><button data-getstarted type="button" title="${translate(
+      'Map advanced properties'
+    )}"><i class="icon icon-24 icon-settings"></i></button></li>
   </ul>
 `
 
@@ -304,6 +340,11 @@ export class EditBar extends WithTemplate {
     this._onClick('tilelayers', () => this._leafletMap.editTileLayers())
     this._onClick('center', () => this._umap.editCenter())
     this._onClick('permissions', () => this._umap.permissions.edit())
+    this._onClick('rules', () => {
+      const container = L.DomUtil.create('div')
+      this._umap.rules.edit(container)
+      this._umap.editPanel.open({ content: container, highlight: 'settings' })
+    })
     this._onClick('settings', () => this._umap.edit())
     this._addTitle('import', 'IMPORT_PANEL')
     this._addTitle('marker', 'DRAW_MARKER')
@@ -324,6 +365,7 @@ export class EditBar extends WithTemplate {
     this.elements.tilelayers.hidden = this._umap.properties.editMode !== 'advanced'
     this.elements.center.hidden = this._umap.properties.editMode !== 'advanced'
     this.elements.permissions.hidden = this._umap.properties.editMode !== 'advanced'
+    this.elements.rules.hidden = this._umap.properties.editMode !== 'advanced'
     this.elements.settings.hidden = this._umap.properties.editMode !== 'advanced'
     this.elements.route.hidden = !this._umap.properties.ORSAPIKey
   }

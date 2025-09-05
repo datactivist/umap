@@ -11,6 +11,7 @@ umap.conf
 /data
 /static
 package-lock.json
+venv
 
 ### Python ###
 # Byte-compiled / optimized / DLL files
