@@ -2,21 +2,38 @@
 
 {% url "search" as search_url %}
 {% trans "Search maps" as default_placeholder %}
-<div class="wrapper search_wrapper">
-  <div class="row">
-    <form class="search-form flex-break" action="{% firstof action search_url %}" method="get">
-      <input name="q"
-             type="search"
-             placeholder="{% firstof placeholder default_placeholder %}"
-             aria-label="{% firstof placeholder default_placeholder %}"
-             value="{{ request.GET.q|default:"" }}" />
-      <select name="tags">
-        <option value="">{% trans "Any category" %}</option>
-        {% for value, label in UMAP_TAGS %}
+
+<div class="fr-container fr-my-3w">
+  <form class="fr-search-bar" action="{% firstof action search_url %}" method="get" role="search">
+    <label class="fr-label" for="search-input">
+      {% trans "Search maps" %}
+    </label>
+
+    <!-- Search input -->
+    <input
+      class="fr-input"
+      id="search-input"
+      name="q"
+      type="search"
+      placeholder="{% firstof placeholder default_placeholder %}"
+      aria-label="{% firstof placeholder default_placeholder %}"
+      value="{{ request.GET.q|default:'' }}"
+    />
+
+    <!-- Category selector -->
+    <label class="fr-label" for="tag-select">
+      {% trans "Category" %}
+    </label>
+    <select class="fr-select" id="tag-select" name="tags" style="margin: 0px;">
+      <option value="">{% trans "Any category" %}</option>
+      {% for value, label in UMAP_TAGS %}
         <option value="{{ value }}" {% if request.GET.tags == value %}selected{% endif %}>{{ label }}</option>
-        {% endfor %}
-      </select>
-      <input type="submit" value="{% trans "Search" %}" />
-    </form>
-  </div>
+      {% endfor %}
+    </select>
+
+    <!-- Submit button -->
+    <button class="fr-btn" type="submit">
+      {% trans "Search" %}
+    </button>
+  </form>
 </div>
