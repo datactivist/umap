@@ -1,0 +1,3 @@
+.fr-display-lg, .fr-display-md, .fr-display-sm, .fr-display-xl, .fr-display-xs, .fr-h1, .fr-h2, .fr-h3, .fr-h4, .fr-h5, .fr-h6, h1, h2, h3, h4, h5, h6 {
+  color: var(--umap-text-color);
+}
