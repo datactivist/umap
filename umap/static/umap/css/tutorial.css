@@ -1,0 +1,52 @@
+.tutorial-overlay {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 99998;
+}
+.tutorial-highlight {
+  box-shadow: 0 0 0 4px rgba(255,200,0,0.9);
+  position: relative;
+  z-index: 99999 !important;
+}
+.tutorial-panel {
+  background: #fff;
+  padding: 12px;
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+  position: absolute; /* positioned by JS */
+  z-index: 100000; /* above overlay/highlight */
+  max-width: 720px;
+  width: calc(100% - 24px);
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+/* DSFR modal class adjustments (the panel element already uses fr-modal classes) */
+.fr-modal.fr-modal--opened {
+  width: 720px;
+  max-width: 95vw;
+}
+
+/* Inner modal body adjustments to avoid forcing horizontal scroll */
+.tutorial-panel .fr-modal__body,
+.tutorial-panel .fr-modal__content {
+  box-sizing: border-box;
+  max-width: 100%;
+  overflow-wrap: break-word;
+  overflow-x: hidden;
+}
+
+.tutorial-panel .fr-modal__footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tutorial-click-proxy {
+  /* ensure proxy doesn't add scrollbars */
+  will-change: transform;
+}

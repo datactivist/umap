@@ -1,12 +1,13 @@
 {% extends "base.html" %}
 
-{% load umap_tags i18n %}
+{% load umap_tags i18n static %}
 
 {% block body_class %}
   content
 {% endblock body_class %}
 {% block extra_head %}
   {% umap_css %}
+  <link rel="stylesheet" href="{% static 'umap/css/tutorial.css' %}">
   {{ block.super }}
   {% umap_js %}
 {% endblock extra_head %}

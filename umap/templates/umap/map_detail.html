@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load umap_tags i18n %}
+{% load umap_tags i18n static %}
 
 {% block head_title %}
   {{ map.name }} - {{ SITE_NAME }} - {{ SITE_DESCRIPTION }}
@@ -16,6 +16,7 @@
   {% endif %}
   {% umap_css %}
   {{ block.super }}
+  <link rel="stylesheet" href="{% static 'umap/css/tutorial.css' %}" />
   {% umap_js locale=locale %}
   {% if UMAP_DEMO_SITE or object.share_status != object.PUBLIC %}
     <meta name="robots" content="noindex,nofollow">
@@ -34,3 +35,237 @@
     {% include "umap/map_init.html" %}
   {% endblock map_init %}
 {% endblock content %}
+
+{% block bottom_js %}
+  {{ block.super }}
+  <script type="module">
+    import Tutorial from '{% static "umap/js/components/tutorial.js" %}'
+
+    document.addEventListener('DOMContentLoaded', () => {
+  const steps = [
+        {
+          // topbar importers button
+          selector: '.umap-main-edit-toolbox .importers, .umap-main-edit-toolbox [data-ref="importersButton"]',
+          title: 'Assistants d\'import',
+          text: "Cliquez sur le bouton 'Import helpers' pour ouvrir l'assistant d'import.",
+          showNext: false,
+          anchor: 'bottom-right',
+        },
+        {
+          // importer dialog
+          selector: '.umap-dialog.window.importers, .importers.dialog, .umap-importers, .umap-dialog.importers',
+          title: "Assistant d'import",
+          text: "Ici, choisissez un type de source de données.",
+          showNext: false,
+          showPrev: false,
+          anchor: 'center-bottom'
+        },
+        {
+          // importer-specific dialog shown after selecting a helper
+          selector: '.umap-dialog.window.importer, .umap-dialog.window .importer, .importer.dialog, .overpass.importer, .datasets.importer, .geodatamine.importer',
+          title: "Choisir les données",
+          text: "Choisissez le jeu de données ou renseignez l'expression, puis validez en cliquant sur le bouton de confirmation.",
+          showNext: false,
+          showPrev: false,
+          anchor: 'bottom',
+          nextLabel: 'Suivant',
+        },
+        {
+          // final: the import panel submit button that performs the import
+          selector: '.umap-import [name="submit"], .umap-import input[name="submit"]',
+          title: "Importer les données",
+          text: "L'assistant a rempli automatiquement le formulaire, cliquez sur 'Importer des données' pour lancer l'import.",
+          showNext: false,
+          showPrev: false,
+          anchor: 'center-left',
+        },
+        {
+          // explorer/data browser control highlight
+          selector: '.umap-control-browse, .umap-control-browse button, .leaflet-control-browse',
+          title: "Explorateur de données",
+          text: "Ouvrez l'explorateur de données pour voir les calques et les jeux de données importés.",
+          anchor: 'right-top',
+          prevLabel: 'Retour',
+          doneLabel: 'Terminé',
+        },
+        /*{
+          // highlight the edit button for the first layer once explorer opened
+          selector: '.umap-browser .feature:first-of-type .icon-edit, .umap-browser .feature:first-of-type [data-ref="edit"], .umap-panel .feature:first-of-type .icon-edit',
+          title: "Modifier le calque",
+          text: "Cliquez sur ce bouton pour modifier le calque que vous venez d'importer.",
+          anchor: 'left-middle',
+          prevLabel: 'Retour',
+          doneLabel: 'Terminé',
+        },*/
+      ]
+
+      const tour = new Tutorial(steps)
+      tour.start()
+
+      // Debounced advance helper: prevents multiple quick calls from
+      // advancing the tour more than once (race between click and alert).
+      let _advanceLocked = false;
+      const advanceOnce = () => {
+        if (_advanceLocked) return;
+        _advanceLocked = true;
+        try {
+          if (tour.index < (steps.length - 1)) tour.next();
+        } catch (err) { console.log('[Tutorial] advanceOnce failed', err); }
+        setTimeout(() => { _advanceLocked = false }, 700);
+      }
+
+      // When the importers button is clicked, advance the tour to the next step
+      // can highlight the importer dialog. The bar registers its own click
+      // handlers; we just listen for clicks and advance the tour when needed.
+      const importBtn = document.querySelector('.umap-main-edit-toolbox .importers, .umap-main-edit-toolbox [data-ref="importersButton"]')
+      if (importBtn) {
+    importBtn.addEventListener('click', () => {
+          // Small timeout to let the importer dialog render
+          setTimeout(() => {
+      advanceOnce()
+          }, 250)
+        })
+      }
+
+      // Delegated click handler: when a helper button in the importers grid
+      // is clicked (including clicks on inner icons/labels), the
+      // importer-specific dialog will open; advance the tour. Use
+      // closest() to find button/link ancestors and verify they're inside
+      // a known importers grid/dialog container before advancing.
+      document.addEventListener('click', (e) => {
+        // only act when we're on the importers-grid step
+        if (tour.index !== 1) return
+        // find the nearest actionable element (button/link)
+        const actionEl = e.target && e.target.closest && e.target.closest('button, a, [role="button"]')
+        if (!actionEl) return
+        // confirm the actionable element is inside an importer grid/dialog
+        const gridContainer = actionEl.closest && actionEl.closest('.umap-dialog.window.importers, .importers.dialog, .umap-importers, .umap-dialog.importers, [data-ref="grid"], .grid-container')
+        if (gridContainer) {
+          // tiny delay to let the importer.open() process and dialog content update
+          setTimeout(() => {
+            if (tour.index === 1) advanceOnce()
+          }, 80)
+        }
+      })
+
+      // If the importer dialog is opened by other means (keyboard shortcut),
+      // detect its appearance and advance the tour to the importer step.
+      const observer = new MutationObserver((mutations) => {
+        for (const m of mutations) {
+          for (const node of m.addedNodes) {
+            if (!(node instanceof HTMLElement)) continue
+            if (node.matches && node.matches('.umap-dialog.window.importers, .importers.dialog, .umap-importers, .umap-dialog.importers')) {
+              // Advance only if we're on the first step
+              if (tour.index === 0) advanceOnce()
+            }
+            // importer-specific dialog (opened after selecting a helper)
+            if (node.matches && node.matches('.umap-dialog.window.importer, .umap-dialog.window .importer, .importer.dialog, .overpass.importer, .datasets.importer')) {
+              // Advance only if we're on the importer-grid step
+              if (tour.index === 1) advanceOnce()
+            }
+          }
+        }
+      })
+      // Also observe for nodes added inside existing dialogs: some importers
+      const innerObserver = new MutationObserver((mutations) => {
+        for (const m of mutations) {
+          // if content was added to a dialog template while we're on step 2,
+          // advance to step 3.
+          if (tour.index !== 1) continue
+          for (const node of m.addedNodes) {
+            if (!(node instanceof HTMLElement)) continue
+            // check for importer-specific markers
+            if (node.matches('.importer, .overpass, .datasets, .geodatamine') || node.querySelector && node.querySelector('.importer, .overpass, .datasets, .geodatamine')) {
+              advanceOnce()
+              return
+            }
+          }
+        }
+      })
+      // Observe body subtree for added/changed nodes (limit to subtree already)
+      innerObserver.observe(document.body, { childList: true, subtree: true })
+      observer.observe(document.body, { childList: true, subtree: true })
+
+      // Watcher: when we reach importer-specific dialog (step index 2), wait
+      // for the helper to populate the import panel (URL or enabled submit) and
+      // then advance the tour to highlight the import button (step index 3).
+      let _importPopulatePoll = null
+      const startImportPopulateWatcher = () => {
+        if (_importPopulatePoll) return
+        _importPopulatePoll = setInterval(() => {
+          // stop if user left the importer dialog step
+          if (tour.index !== 2) {
+            clearInterval(_importPopulatePoll)
+            _importPopulatePoll = null
+            return
+          }
+          const urlInput = document.querySelector('.umap-import [type="url"], .umap-import input[type="url"]')
+          const submitBtn = document.querySelector('.umap-import [name="submit"], .umap-import input[name="submit"]')
+          if ((urlInput && urlInput.value) || (submitBtn && !submitBtn.disabled)) {
+            clearInterval(_importPopulatePoll)
+            _importPopulatePoll = null
+            // Advance to the final step (import button)
+            advanceOnce()
+          }
+        }, 150)
+      }
+
+      // Start watcher when the tour reaches step index 2.
+      const tourIndexChecker = setInterval(() => {
+        if (tour.index === 2) startImportPopulateWatcher()
+      }, 200)
+
+      // Advance to final informational step when the user clicks the import submit button.
+      document.addEventListener('click', (e) => {
+        const btn = e.target.closest && e.target.closest('.umap-import [name="submit"], .umap-import input[name="submit"]')
+          if (btn) {
+          // allow natural import flow to start, then advance one step to the
+          // informational/post-import step so the explorer step remains until
+          // user action.
+          setTimeout(() => {
+            try {
+              advanceOnce()
+            } catch (err) { console.log('[Tutorial] failed to advance to next step', err) }
+          }, 120)
+        }
+      })
+
+      // Also advance when an import success alert is emitted by importer.
+      // Alerts are dispatched as CustomEvents 'umap:alert' from uMapAlert.emit
+      const onAlert = (event) => {
+        const { level = 'info', message = '' } = event.detail || {}
+        // consider success-level alerts only
+        if (level === 'success') {
+          // If we're on or before the post-import informational step, only
+          // advance one step (to the explorer control).
+          try {
+            // ensure we don't accidentally jump more than one step and
+            // never advance past the last defined step
+            advanceOnce()
+          } catch (err) { console.log('[Tutorial] onAlert advance failed', err) }
+        }
+      }
+      document.addEventListener('umap:alert', onAlert)
+
+      // When the user clicks the Explorateur control, wait for the first
+      // feature's edit button to appear and then advance the tour to the
+      // edit-button step (which is the last step now).
+      const browserBtn = document.querySelector('button[title="Explorateur"], button[data-ref="button"], .umap-control-browse button, .umap-control-browse')
+      if (browserBtn) {
+        browserBtn.addEventListener('click', () => {
+          // poll for the first feature edit button and advance when found
+          const editSelector = '.umap-browser .feature:first-of-type .icon-edit, .umap-browser .feature:first-of-type [data-ref="edit"]'
+          const poll = setInterval(() => {
+            const el = document.querySelector(editSelector)
+            if (el) {
+              clearInterval(poll)
+              try {
+                advanceOnce()
+              } catch (err) { console.log('[Tutorial] advance to edit failed', err) }
+            }
+          }, 150)
+        })
+      }
+    })
+  </script>
+{% endblock bottom_js %}

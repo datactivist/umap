@@ -1,6 +1,6 @@
 {% extends "umap/content.html" %}
 
-{% load umap_tags i18n %}
+{% load umap_tags i18n static %}
 
 {% block messages %}
   {# We don't want maps in the list to display errors. #}
@@ -30,4 +30,49 @@
       </div>
     {% endif %}
   </div>
+
+  <div class="wrapper">
+    <div class="row">
+      <div class="col">
+        {% if user.is_authenticated %}
+          <button id="simplified-toggle" class="fr-btn fr-btn--secondary" data-default="{{ SIMPLIFIED_MODE|yesno:'true,false' }}" aria-pressed="false">{% trans 'Simplified' %}</button>
+        {% endif %}
+      </div>
+    </div>
+  </div>
 {% endblock maincontent %}
+
+
+
+{% block bottom_js %}
+  {{ block.super }}
+  <script type="module">
+
+    console.log("home: tutorial module loading")
+
+    import Tutorial from '{% static "umap/js/components/tutorial.js" %}'
+
+    console.log('home: tutorial module imported')
+
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('home: DOMContentLoaded (tutorial init)')
+      const steps = [
+        { selector: '#nav-login-link', title: 'Se connecter', text: 'Connectez-vous pour pouvoir sauvegarder et gérer vos cartes.', nextLabel: 'Continuer sans se connecter' },
+        { selector: '#create-map-btn', title: 'Créer une carte', text: 'Appuyez sur le bouton "Créer une carte" pour commencer à créer votre première carte.' },
+      ]
+
+      const tour = new Tutorial(steps)
+      tour.start()
+
+      const createBtn = document.querySelector('#create-map-btn')
+      if (createBtn) {
+        createBtn.addEventListener('click', () => {
+          console.log('home: create button clicked, advancing tutorial')
+          tour.next()
+        })
+      } else {
+        console.log('home: create button not found')
+      }
+    })
+  </script>
+{% endblock bottom_js %}

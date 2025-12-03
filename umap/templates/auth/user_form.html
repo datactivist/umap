@@ -23,6 +23,38 @@
         {{ form }}
         <input type="submit" value="{% trans "Save" %}" />
       </form>
+      <div class="row">
+        <button id="profile-simplified-toggle" data-default="{{ SIMPLIFIED_MODE|yesno:'true,false' }}" class="fr-btn fr-btn--secondary" type="button">{% trans "Toggle simplified mode" %}</button>
+      </div>
+      <script>
+        document.addEventListener('DOMContentLoaded', function () {
+          var btn = document.getElementById('profile-simplified-toggle')
+          if (!btn) return
+          var stored = localStorage.getItem('simplified_mode')
+          var initial = stored === null ? (btn.dataset.default === 'true') : (stored === 'true')
+          document.body.classList.toggle('simplified-mode', initial)
+          btn.addEventListener('click', function () {
+            var current = document.body.classList.contains('simplified-mode')
+            var next = !current
+            document.body.classList.toggle('simplified-mode', next)
+            localStorage.setItem('simplified_mode', next ? 'true' : 'false')
+            // Persist to server session
+            fetch('{% url "simplified_mode_set" %}', {
+              method: 'POST',
+              credentials: 'same-origin',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': (document.cookie.match(/(^|;)\s*csrftoken=([^;]+)/)||[])[2]||'',
+                'Accept': 'application/json'
+              },
+              body: JSON.stringify({simplified: next})
+            }).then(function (r) { return r.json() }).then(function (data) {
+              console.log('Profile toggle persisted to session, simplified_mode=', data.simplified)
+            }).catch(function (err) { console.log('Failed to persist simplified mode to session', err) })
+            console.log('Profile toggle clicked, simplified_mode=', next)
+          })
+        })
+      </script>
     </div>
     {% if backends.backends|length %}
       <div class="row">

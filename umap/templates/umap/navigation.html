@@ -26,8 +26,6 @@
           // Normalize both paths for comparison
           var normalizedCurrentPath = normalizePath(currentPath);
           var normalizedLinkPath = normalizePath(linkPath);
-
-          console.log("Comparing current path:", normalizedCurrentPath, "with link path:", normalizedLinkPath);
           
           // Check if current path starts with the link path (for sub-pages)
           // But avoid matching root/index with everything
@@ -112,7 +110,7 @@
           </li>
         {% else %}
           <li class="fr-nav__item">
-            <a class="fr-nav__link" href="{% url 'login' %}">{% trans 'Log in' %} / {% trans 'Sign in' %}</a>
+            <a id="nav-login-link" class="fr-nav__link" href="{% url 'login' %}">{% trans 'Log in' %}</a>
           </li>
         {% endif %}
 
@@ -139,3 +137,41 @@
   </div>
 </header>
 <br />
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var btn = document.getElementById('simplified-toggle')
+    if (!btn) return
+
+    // Initialize from localStorage, fallback to server default stored on the button
+    var stored = localStorage.getItem('simplified_mode')
+    var initial = null
+    if (stored === null) {
+      initial = btn.dataset.default === 'true'
+    } else {
+      initial = stored === 'true'
+    }
+    btn.setAttribute('aria-pressed', initial ? 'true' : 'false')
+    document.body.classList.toggle('simplified-mode', !!initial)
+
+    btn.addEventListener('click', function () {
+      var current = btn.getAttribute('aria-pressed') === 'true'
+      var next = !current
+      btn.setAttribute('aria-pressed', next ? 'true' : 'false')
+      document.body.classList.toggle('simplified-mode', next)
+      localStorage.setItem('simplified_mode', next ? 'true' : 'false')
+      // Persist to server session
+      fetch('{% url "simplified_mode_set" %}', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': (document.cookie.match(/(^|;)\s*csrftoken=([^;]+)/)||[])[2]||'',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({simplified: next})
+      }).then(function (r) { return r.json() }).then(function (data) {
+        console.log('Simplified mode persisted to session, server state=', data.simplified)
+      }).catch(function (err) { console.log('Failed to persist simplified mode to session', err) })
+    })
+  })
+</script>
