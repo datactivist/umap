@@ -155,9 +155,9 @@
 
     btn.addEventListener('click', function () {
       var current = btn.getAttribute('aria-pressed') === 'true'
-      var next = !current
+      // Toggle class and use returned value as new state
+      var next = document.body.classList.toggle('simplified-mode')
       btn.setAttribute('aria-pressed', next ? 'true' : 'false')
-      document.body.classList.toggle('simplified-mode', next)
       localStorage.setItem('simplified_mode', next ? 'true' : 'false')
       // Persist to server session
       fetch('{% url "simplified_mode_set" %}', {
@@ -171,7 +171,10 @@
         body: JSON.stringify({simplified: next})
       }).then(function (r) { return r.json() }).then(function (data) {
         console.log('Simplified mode persisted to session, server state=', data.simplified)
+        // reload the page to apply changes
+        location.reload()
       }).catch(function (err) { console.log('Failed to persist simplified mode to session', err) })
+      
     })
   })
 </script>

@@ -3,7 +3,7 @@
 {% load umap_tags i18n static %}
 
 {% block body_class %}
-  content
+  content{% if SIMPLIFIED_MODE %} simplified-mode{% endif %}
 {% endblock body_class %}
 {% block extra_head %}
   {% umap_css %}

@@ -198,6 +198,30 @@ export default class Importer extends Utils.WithTemplate {
     this.dialog.open({ template: element, cancel: false, accept: false, back: false })
   }
 
+  // Programmatic helper to open a specific importer and pass parameters.
+  // Example: umap.importer.openHelper('overpass', { expression: 'amenity=drinking_water' })
+  openHelper(nameOrId, params = {}) {
+    const lower = (nameOrId || '').toString().toLowerCase()
+    const found = this.IMPORTERS.find((p) => {
+      return (
+        p.id === nameOrId ||
+        p.name === nameOrId ||
+        p.id === lower ||
+        (p.name && p.name.toLowerCase() === lower)
+      )
+    })
+    if (!found) {
+      console.warn('Importer not found:', nameOrId)
+      return null
+    }
+    try {
+      found.open(this, params)
+    } catch (e) {
+      console.error('Error opening importer', nameOrId, e)
+    }
+    return found
+  }
+
   build() {
     this.container = this.loadTemplate(TEMPLATE)
     if (this.IMPORTERS.length) {

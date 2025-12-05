@@ -56,11 +56,13 @@ export class Importer {
     this.expression = null
   }
 
-  async open(importer) {
+  async open(importer, params = {}) {
     const container = DomUtil.create('div')
     container.innerHTML = TEMPLATE
-    if (this.expression) {
-      container.querySelector('[name=tags]').value = this.expression
+    // Prefill expression from previous use or from params
+    const preExpr = params.expression || this.expression
+    if (preExpr) {
+      container.querySelector('[name=tags]').value = preExpr
     }
     this.autocomplete = new Autocomplete(container.querySelector('#area'), {
       url: this.searchUrl,
@@ -93,6 +95,21 @@ export class Importer {
       importer.url = `${this.baseUrl}?data=${query}`
       if (this.boundaryChoice) importer.layerName = this.boundaryChoice.item.label
       importer.format = 'osm'
+    }
+
+    // If caller provided params to immediately confirm, build URL and close
+    if (params && params.autoConfirm) {
+      // simulate form values
+      const fakeForm = {
+        tags: params.expression || container.querySelector('[name=tags]').value,
+        out: params.out || container.querySelector('[name=out]').value,
+      }
+      // allow also passing an explicit area id (area:XXX) or bbox
+      if (params.area) {
+        this.boundaryChoice = { item: { value: params.area, label: params.area } }
+      }
+      confirm(fakeForm)
+      return
     }
 
     importer.dialog

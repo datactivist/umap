@@ -444,6 +444,16 @@ export class EditBar extends WithTemplate {
     this._addTitle('marker', 'DRAW_MARKER')
     this._addTitle('polyline', 'DRAW_LINE')
     this._addTitle('polygon', 'DRAW_POLYGON')
+    // Hide center control in simplified mode
+    if (document.body.classList.contains('simplified-mode')) {
+      try {
+        this.elements.center.hidden = true
+      } catch (e) {
+        // ignore if element not present
+      }
+    } else {
+      this._addTitle('center', 'Edit map default view')
+    }
     this._leafletMap.on('seteditedfeature', () => this.redraw())
   }
 

@@ -1,15 +1,18 @@
 /* Simple tutorial / guided-tour component
    Usage:
      import Tutorial from './components/tutorial.js'
-     const tour = new Tutorial(steps)
+     // pass an optional tourId (e.g. 'home', 'map') to track per-tour ended state
+     const tour = new Tutorial(steps, 'home')
      tour.start()
 
    Steps: [{ selector: '.my-button', title: 'Step 1', text: 'Click this button' }, ...]
 */
 
 class Tutorial {
-  constructor(steps = []) {
+  // Accept optional tourId (string) to track per-tour ended state in localStorage
+  constructor(steps = [], tourId = null) {
     this.steps = steps
+    this.tourId = tourId
     this.index = 0
     this.overlay = null
     this.panel = null
@@ -152,10 +155,11 @@ class Tutorial {
       const doneBtnEl = this.panel.querySelector('.tutorial-done')
       if (nextBtnEl) nextBtnEl.addEventListener('click', () => this.next())
       if (prevBtnEl) prevBtnEl.addEventListener('click', () => this.prev())
-      if (doneBtnEl) doneBtnEl.addEventListener('click', () => this.end())
+      // 'Done' / 'Skip' should explicitly clear the global flag
+      if (doneBtnEl) doneBtnEl.addEventListener('click', () => this.skip())
       // close button in header
       const closeBtn = this.panel.querySelector('#tutorial-close-btn')
-      if (closeBtn) closeBtn.addEventListener('click', () => this.end())
+      if (closeBtn) closeBtn.addEventListener('click', () => this.skip())
     }
 
     // Apply per-step labels if provided
@@ -269,9 +273,20 @@ class Tutorial {
     
   }
 
-  end() {
-  console.log('[Tutorial] ending tour')
+  end(explicitEnded = false) {
+    console.log('[Tutorial] ending tour', { explicitEnded, tourId: this.tourId })
+    try {
+      if (window.localStorage && this.tourId) {
+        // mark this specific tour as ended
+        window.localStorage.setItem('umapTutorialEnded_' + this.tourId, '1')
+      }
+    } catch (err) { /* ignore storage errors */ }
     this.cleanup()
+  }
+
+  // Explicit skip action (marks only this tour as ended)
+  skip() {
+    this.end(true)
   }
 
   cleanup() {
@@ -316,7 +331,7 @@ class Tutorial {
   }
 
   onKey(e) {
-    if (e.key === 'Escape') this.end()
+    if (e.key === 'Escape') this.skip()
     if (e.key === 'ArrowRight') this.next()
     if (e.key === 'ArrowLeft') this.prev()
   }

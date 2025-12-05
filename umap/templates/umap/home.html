@@ -6,6 +6,11 @@
   {# We don't want maps in the list to display errors. #}
 {% endblock messages %}
 {% block maincontent %}
+  <button id="start-tutorial-btn" class="fr-btn fr-btn--tertiary">{% trans 'Start tutorial' %}</button>
+  <div class="mt-2">
+    <button id="simplified-toggle" class="fr-btn fr-btn--secondary" data-default="{{ SIMPLIFIED_MODE|yesno:'true,false' }}" aria-pressed="false">{% trans 'Simplified' %}</button>
+    <span id="simplified-status">{% if SIMPLIFIED_MODE %}{{ 'Simplified mode is ON' }}{% else %}{{ 'Simplified mode is OFF' }}{% endif %}</span>
+  </div>
   {% include "umap/search_bar.html" %}
   {% include "umap/about_summary.html" %}
   {% if showcase_map %}
@@ -31,15 +36,7 @@
     {% endif %}
   </div>
 
-  <div class="wrapper">
-    <div class="row">
-      <div class="col">
-        {% if user.is_authenticated %}
-          <button id="simplified-toggle" class="fr-btn fr-btn--secondary" data-default="{{ SIMPLIFIED_MODE|yesno:'true,false' }}" aria-pressed="false">{% trans 'Simplified' %}</button>
-        {% endif %}
-      </div>
-    </div>
-  </div>
+  
 {% endblock maincontent %}
 
 
@@ -61,14 +58,52 @@
         { selector: '#create-map-btn', title: 'Créer une carte', text: 'Appuyez sur le bouton "Créer une carte" pour commencer à créer votre première carte.' },
       ]
 
-      const tour = new Tutorial(steps)
-      tour.start()
+      const tutorialKey = 'umapTutorialActive'
+      const endedPrefix = 'umapTutorialEnded_'
+      let tour = null
+
+      const isActive = (() => {
+        try { return localStorage.getItem(tutorialKey) === '1' } catch (err) { return false }
+      })()
+
+      // Only auto-start the home tutorial if global active flag is set and
+      // the per-tour ended flag for 'home' is NOT set.
+      const isHomeEnded = (() => {
+        try { return localStorage.getItem(endedPrefix + 'home') === '1' } catch (err) { return false }
+      })()
+
+      if (isActive && !isHomeEnded) {
+        tour = new Tutorial(steps, 'home')
+        tour.start()
+      }
+
+      // Start tutorial button on home page: reset all per-tour ended flags,
+      // set the global flag and start the home tour.
+      const startBtn = document.querySelector('#start-tutorial-btn')
+      if (startBtn) {
+        startBtn.addEventListener('click', () => {
+          try {
+            // Clear all ended flags
+            for (let i = 0; i < localStorage.length; i++) {
+              const key = localStorage.key(i)
+              if (key && key.indexOf(endedPrefix) === 0) {
+                localStorage.removeItem(key)
+                // since we mutated localStorage, adjust index
+                i--
+              }
+            }
+            localStorage.setItem(tutorialKey, '1')
+          } catch (err) { console.log('[Tutorial] failed to reset flags', err) }
+          if (!tour) tour = new Tutorial(steps, 'home')
+          try { tour.start() } catch (err) { console.log('[Tutorial] failed to start', err) }
+        })
+      }
 
       const createBtn = document.querySelector('#create-map-btn')
       if (createBtn) {
         createBtn.addEventListener('click', () => {
           console.log('home: create button clicked, advancing tutorial')
-          tour.next()
+          if (tour) tour.next()
         })
       } else {
         console.log('home: create button not found')

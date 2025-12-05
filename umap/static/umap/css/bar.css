@@ -245,6 +245,51 @@
     padding: 0;
     margin: 0;
 }
+
+/* When simplified mode is active, show human-readable labels next to edit-bar icons. */
+body.simplified-mode .umap-edit-bar {
+    width: auto; /* allow expansion to fit labels */
+    min-width: calc(var(--control-size) * 4);
+    padding: 6px;
+}
+body.simplified-mode .umap-edit-bar li {
+    display: flex;
+    align-items: center;
+    width: auto;
+    height: var(--control-size);
+}
+body.simplified-mode .umap-edit-bar button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.6rem;
+    white-space: nowrap;
+}
+/* Use the button's title attribute for the visible label without modifying markup. */
+body.simplified-mode .umap-edit-bar button::after {
+    content: attr(title);
+    font-size: 0.95rem;
+    color: inherit;
+    opacity: 0.95;
+}
+/* Keep icons from stretching */
+body.simplified-mode .umap-edit-bar button > i {
+    flex: 0 0 auto;
+}
+/* On very small viewports, fall back to icon-only to avoid overflow */
+@media all and (max-width: 480px) {
+    body.simplified-mode .umap-edit-bar {
+        width: var(--control-size);
+        min-width: var(--control-size);
+        padding: 0;
+    }
+    body.simplified-mode .umap-edit-bar li {
+        width: var(--control-size);
+    }
+    body.simplified-mode .umap-edit-bar button::after {
+        display: none;
+    }
+}
 @media all and (max-width: 980px) {
     .umap-main-edit-toolbox button span {
         display: none;
@@ -255,4 +300,17 @@
     .umap-main-edit-toolbox .share-status {
         display: none !important;
     }
+}
+
+/* Shift right-side panel left when simplified mode is enabled to avoid overlapping controls */
+body.simplified-mode .with-transition.panel.window.right.dark.on {
+    /* shift left by 80px; tweak this value to taste */
+    transform: translateX(-300px);
+    /* keep existing smooth transitions */
+    transition: transform 240ms ease, opacity 180ms ease;
+}
+
+/* Failsafe: hide center control in simplified mode */
+body.simplified-mode .umap-edit-bar [data-ref="center"] {
+    display: none !important;
 }

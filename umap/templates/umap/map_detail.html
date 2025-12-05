@@ -6,7 +6,7 @@
   {{ map.name }} - {{ SITE_NAME }} - {{ SITE_DESCRIPTION }}
 {% endblock head_title %}
 {% block body_class %}
-  map_detail
+  map_detail{% if SIMPLIFIED_MODE %} simplified-mode{% endif %}
 {% endblock body_class %}
 {% block extra_head %}
   {% if preconnect_domains %}
@@ -42,64 +42,81 @@
     import Tutorial from '{% static "umap/js/components/tutorial.js" %}'
 
     document.addEventListener('DOMContentLoaded', () => {
-  const steps = [
-        {
-          // topbar importers button
-          selector: '.umap-main-edit-toolbox .importers, .umap-main-edit-toolbox [data-ref="importersButton"]',
-          title: 'Assistants d\'import',
-          text: "Cliquez sur le bouton 'Import helpers' pour ouvrir l'assistant d'import.",
-          showNext: false,
-          anchor: 'bottom-right',
-        },
-        {
-          // importer dialog
-          selector: '.umap-dialog.window.importers, .importers.dialog, .umap-importers, .umap-dialog.importers',
-          title: "Assistant d'import",
-          text: "Ici, choisissez un type de source de données.",
-          showNext: false,
-          showPrev: false,
-          anchor: 'center-bottom'
-        },
-        {
-          // importer-specific dialog shown after selecting a helper
-          selector: '.umap-dialog.window.importer, .umap-dialog.window .importer, .importer.dialog, .overpass.importer, .datasets.importer, .geodatamine.importer',
-          title: "Choisir les données",
-          text: "Choisissez le jeu de données ou renseignez l'expression, puis validez en cliquant sur le bouton de confirmation.",
-          showNext: false,
-          showPrev: false,
-          anchor: 'bottom',
-          nextLabel: 'Suivant',
-        },
-        {
-          // final: the import panel submit button that performs the import
-          selector: '.umap-import [name="submit"], .umap-import input[name="submit"]',
-          title: "Importer les données",
-          text: "L'assistant a rempli automatiquement le formulaire, cliquez sur 'Importer des données' pour lancer l'import.",
-          showNext: false,
-          showPrev: false,
-          anchor: 'center-left',
-        },
-        {
-          // explorer/data browser control highlight
-          selector: '.umap-control-browse, .umap-control-browse button, .leaflet-control-browse',
-          title: "Explorateur de données",
-          text: "Ouvrez l'explorateur de données pour voir les calques et les jeux de données importés.",
-          anchor: 'right-top',
-          prevLabel: 'Retour',
-          doneLabel: 'Terminé',
-        },
-        /*{
-          // highlight the edit button for the first layer once explorer opened
-          selector: '.umap-browser .feature:first-of-type .icon-edit, .umap-browser .feature:first-of-type [data-ref="edit"], .umap-panel .feature:first-of-type .icon-edit',
-          title: "Modifier le calque",
-          text: "Cliquez sur ce bouton pour modifier le calque que vous venez d'importer.",
-          anchor: 'left-middle',
-          prevLabel: 'Retour',
-          doneLabel: 'Terminé',
-        },*/
+
+      const tutorialKey = 'umapTutorialActive'
+      const endedPrefix = 'umapTutorialEnded_'
+      const isActive = (() => { try { return localStorage.getItem(tutorialKey) === '1' } catch (err) { return false } })()
+      if (!isActive) return
+      // don't auto-start if this specific map tutorial was already ended
+      const isMapEnded = (() => { try { return localStorage.getItem(endedPrefix + 'map') === '1' } catch (err) { return false } })()
+      if (isMapEnded) return
+      const steps = [
+            {
+              // topbar importers button
+              selector: '.umap-main-edit-toolbox .importers, .umap-main-edit-toolbox [data-ref="importersButton"]',
+              title: 'Assistants d\'import',
+              text: "Cliquez sur le bouton 'Import helpers' pour ouvrir l'assistant d'import.",
+              showNext: false,
+              anchor: 'bottom-right',
+            },
+            {
+              // importer dialog
+              selector: '.umap-dialog.window.importers, .importers.dialog, .umap-importers, .umap-dialog.importers',
+              title: "Assistant d'import",
+              text: "Ici, choisissez un type de source de données.",
+              showNext: false,
+              showPrev: false,
+              anchor: 'center-bottom'
+            },
+            {
+              // importer-specific dialog shown after selecting a helper
+              selector: '.umap-dialog.window.importer, .umap-dialog.window .importer, .importer.dialog, .overpass.importer, .datasets.importer, .geodatamine.importer',
+              title: "Choisir les données",
+              text: "Choisissez le jeu de données ou renseignez l'expression, puis validez en cliquant sur le bouton de confirmation.",
+              showNext: false,
+              showPrev: false,
+              anchor: 'bottom',
+              nextLabel: 'Suivant',
+            },
+            {
+              // final: the import panel submit button that performs the import
+              selector: '.umap-import [name="submit"], .umap-import input[name="submit"]',
+              title: "Importer les données",
+              text: "L'assistant a rempli automatiquement le formulaire, cliquez sur 'Importer des données' pour lancer l'import.",
+              showNext: false,
+              showPrev: false,
+              anchor: 'center-left',
+            },
+            {
+              // explorer/data browser control highlight (now using the layers button)
+              selector: 'li[data-ref="layers"], li[data-ref="layers"] button',
+              title: "Explorateur de données",
+              text: "Ouvrez l'explorateur de données pour voir les calques et les jeux de données importés.",
+              anchor: 'center-left',
+              showNext: false,
+              showPrev: false,
+            },
+            {
+              // highlight the edit button for the first layer once explorer opened
+              selector: '.umap-browser .feature:first-of-type .icon-edit, .umap-browser .feature:first-of-type [data-ref="edit"], .umap-panel .feature:first-of-type .icon-edit, .umap-browser li .icon-edit, .umap-browser button.icon-edit, .umap-panel button.icon-edit, ul[data-ref="ul"] li .icon-edit',
+              title: "Modifier le calque",
+              text: "Cliquez sur ce bouton pour modifier le calque que vous venez d'importer.",
+              anchor: 'center-left',
+              showNext: false,
+              showPrev: false,
+            },
+            {
+              // final step: highlight the layer/feature properties popup so the
+              // user sees the parameters panel. Match known containers/ids.
+              selector: '#umap-feature-shape-properties, .umap-layer-properties-container, .umap-feature-container, .umap-edit-panel .umap-layer-properties-container, .umap-edit-panel #umap-feature-shape-properties',
+              title: "Paramètres d'affichage",
+              text: "Vous avez accès ici aux paramètres permettant de modifier l'affichage des données sur la carte.",
+              anchor: 'center-left',
+              showPrev: false,
+            },
       ]
 
-      const tour = new Tutorial(steps)
+      const tour = new Tutorial(steps, 'map')
       tour.start()
 
       // Debounced advance helper: prevents multiple quick calls from
@@ -126,6 +143,25 @@
           }, 250)
         })
       }
+
+      // Listen for the new layers button (li[data-ref="layers"] button) to advance the tutorial
+      const attachLayersHandler = () => {
+        try {
+          const layersBtn = document.querySelector('li[data-ref="layers"] button')
+          if (layersBtn && !layersBtn.__tutorialBound) {
+            layersBtn.addEventListener('click', () => {
+              try {
+                if (tour.index === 4) advanceOnce()
+              } catch (err) { console.log('[Tutorial] layersBtn advance failed', err) }
+            })
+            layersBtn.__tutorialBound = true
+          }
+        } catch (err) { /* ignore */ }
+      }
+      attachLayersHandler()
+      // fallback: watch for layers button insertion
+      const layersMo = new MutationObserver((mutations) => { attachLayersHandler() })
+      layersMo.observe(document.body, { childList: true, subtree: true })
 
       // Delegated click handler: when a helper button in the importers grid
       // is clicked (including clicks on inner icons/labels), the
@@ -247,25 +283,33 @@
       }
       document.addEventListener('umap:alert', onAlert)
 
-      // When the user clicks the Explorateur control, wait for the first
-      // feature's edit button to appear and then advance the tour to the
-      // edit-button step (which is the last step now).
-      const browserBtn = document.querySelector('button[title="Explorateur"], button[data-ref="button"], .umap-control-browse button, .umap-control-browse')
-      if (browserBtn) {
-        browserBtn.addEventListener('click', () => {
-          // poll for the first feature edit button and advance when found
-          const editSelector = '.umap-browser .feature:first-of-type .icon-edit, .umap-browser .feature:first-of-type [data-ref="edit"]'
-          const poll = setInterval(() => {
-            const el = document.querySelector(editSelector)
-            if (el) {
-              clearInterval(poll)
+      // Listen for clicks on the edit button in the browser list. When the
+      // user clicks edit for the first layer (tour step index for edit is 5),
+      // advance to the final informational step (which has no highlight).
+      const editSelector = '.umap-browser .feature:first-of-type .icon-edit, .umap-browser .feature:first-of-type [data-ref="edit"], .umap-panel .feature:first-of-type .icon-edit, .umap-browser li .icon-edit, .umap-browser button.icon-edit, .umap-panel button.icon-edit, ul[data-ref="ul"] li .icon-edit'
+      const attachEditHandler = () => {
+        try {
+          const editBtn = document.querySelector(editSelector)
+          if (editBtn && !editBtn.__tutorialEditBound) {
+            editBtn.addEventListener('click', () => {
               try {
-                advanceOnce()
-              } catch (err) { console.log('[Tutorial] advance to edit failed', err) }
-            }
-          }, 150)
-        })
+                // If we're currently on the edit-highlight step (index 5),
+                // advance to the final informational step (index 6) which
+                // uses noHighlight and ends the tour after user reads it.
+                if (tour.index === 5) {
+                  advanceOnce()
+                }
+              } catch (err) { console.log('[Tutorial] editBtn advance failed', err) }
+            })
+            editBtn.__tutorialEditBound = true
+          }
+        } catch (err) { /* ignore */ }
       }
+      attachEditHandler()
+      // fallback: observe DOM for edit button insertion
+      const editMo = new MutationObserver(() => { attachEditHandler() })
+      editMo.observe(document.body, { childList: true, subtree: true })
+
     })
   </script>
 {% endblock bottom_js %}

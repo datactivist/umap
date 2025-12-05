@@ -5,12 +5,25 @@
     <div class="col half center mwide">
       {% spaceless %}
         <div class="button-bar {% if demo_map %}half{% endif %}">
-          {% if not UMAP_READONLY %}
-            <a id="create-map-btn" href="{% url 'map_new' %}" class="button button-primary">{% trans "Create a map" %}</a>
-          {% endif %}
-          {% if demo_map %}
-            <a href="{{ demo_map.get_absolute_url }}" class="button neutral">{% trans "Play with the demo" %}</a>
-          {% endif %}
+          {# Use DSFR button group to center and size buttons #}
+          <div class="fr-btns-group fr-btns-group--center fr-btns-group--lg">
+            {% if not UMAP_READONLY %}
+              <div class="fr-btns-group__btn">
+                <a id="create-map-btn"
+                   href="{% url 'map_new' %}"
+                   class="fr-btn fr-btn--primary fr-btn--lg"
+                   role="button"
+                   aria-label="{% trans "Create a map" %}">
+                  {% trans "Create a map" %}
+                </a>
+              </div>
+            {% endif %}
+            {% if demo_map %}
+              <div class="fr-btns-group__btn">
+                <a href="{{ demo_map.get_absolute_url }}" class="fr-btn fr-btn--secondary" aria-label="{% trans "Play with the demo" %}">{% trans "Play with the demo" %}</a>
+              </div>
+            {% endif %}
+          </div>
         </div>
       {% endspaceless %}
     </div>
