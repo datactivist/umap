@@ -129,6 +129,24 @@ html[dir="rtl"] .leaflet-tooltip-pane>* {
     background-color: white;
     min-height: initial;
     padding: 0;
+    text-decoration: none;
+    pointer-events: auto;
+}
+
+/* Prevent anchor clicks from navigating */
+.leaflet-control-zoom a,
+.leaflet-bar a,
+.leaflet-measure-control a,
+.leaflet-control-locate a {
+    cursor: pointer;
+}
+
+.leaflet-control-zoom a:focus,
+.leaflet-bar a:focus,
+.leaflet-measure-control a:focus,
+.leaflet-control-locate a:focus {
+    outline: 2px solid var(--color-darkCyan);
+    outline-offset: 2px;
 }
 
 .leaflet-measure-control a,

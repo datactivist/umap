@@ -150,6 +150,40 @@ const ControlsMixin = {
     if (this._umap.getProperty('moreControl')) this._controls.more.addTo(this)
     if (this._umap.getProperty('scaleControl')) this._controls.scale.addTo(this)
     this._controls.tilelayers.setLayers()
+
+    // Prevent anchor links in controls from navigating
+    this._preventControlAnchors()
+  },
+
+  _preventControlAnchors: function () {
+    // Find all anchor tags in leaflet controls and prevent default behavior
+    const selectors = [
+      '.leaflet-control-zoom a',
+      '.leaflet-bar a',
+      '.leaflet-measure-control a',
+      '.leaflet-control-locate a',
+    ]
+    selectors.forEach((selector) => {
+      this._container.querySelectorAll(selector).forEach((link) => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault()
+        })
+        // Remove href attribute to prevent DSFR issues
+        if (link.getAttribute('href') === '#') {
+          link.removeAttribute('href')
+          // Add role and tabindex for accessibility
+          link.setAttribute('role', 'button')
+          link.setAttribute('tabindex', '0')
+          // Handle keyboard activation
+          link.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault()
+              link.click()
+            }
+          })
+        }
+      })
+    })
   },
 }
 
