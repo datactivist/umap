@@ -43,8 +43,8 @@
 .importers ul .communesfr:before {
     background-image: url(../img/importers/communesfr.svg);
 }
-.importer.solutions-bleues h3:before,
-.importers ul .solutions-bleues:before {
+.importer.données-bleues h3:before,
+.importers ul .données-bleues:before {
     content: '';
     display: block;
     width: 50px;
@@ -59,8 +59,8 @@
     margin-right: 8px;
     margin: 0 auto 8px;
 }
-.importer.solutions-vertes h3:before,
-.importers ul .solutions-vertes:before {
+.importer.données-vertes h3:before,
+.importers ul .données-vertes:before {
     content: '';
     display: block;
     width: 50px;
@@ -75,8 +75,8 @@
     margin-right: 8px;
     margin: 0 auto 8px;
 }
-.importer.solutions-grises h3:before,
-.importers ul .solutions-grises:before {
+.importer.données-grises h3:before,
+.importers ul .données-grises:before {
     content: '';
     display: block;
     width: 50px;

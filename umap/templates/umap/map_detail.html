@@ -51,68 +51,359 @@
       const isMapEnded = (() => { try { return localStorage.getItem(endedPrefix + 'map') === '1' } catch (err) { return false } })()
       if (isMapEnded) return
       const steps = [
+
             {
+              name: 'click-import-button',
               // topbar importers button
-              selector: '.umap-main-edit-toolbox .importers, .umap-main-edit-toolbox [data-ref="importersButton"]',
+              selector: 'button[title="Importer des données (Ctrl+I)"]',
               title: 'Assistants d\'import',
-              text: "Cliquez sur le bouton 'Import helpers' pour ouvrir l'assistant d'import.",
+              text: `Cliquez sur le bouton 'Importer des données (Ctrl+I)' pour ouvrir les assistants d'import.
+                    </br></br>
+                    <i>Pour réaliser l'action décrite, cliquez sur la fonctionnalité en surbrillance (cadre jaune/orange)</i>`,
               showNext: false,
-              anchor: 'bottom-right',
+              anchor: 'corner-bottom-left',
             },
             {
-              // importer dialog
-              selector: '.umap-dialog.window.importers, .importers.dialog, .umap-importers, .umap-dialog.importers',
-              title: "Assistant d'import",
-              text: "Ici, choisissez un type de source de données.",
+              name: 'import-file-input',
+              // importer dialog - file input
+              selector: '.umap-import input[type="file"]',
+              title: "Importer des données locales",
+              text: `La fonctionnalité Importer des données permet d'importer des données locales que l'utilisateur pourra charger depuis son disque local.
+              </br></br>
+              Les formats de données possibles sont <b>le geojson, le csv, le gpx, le kml, l'osm, le georss et le format umap.</b>
+              </br></br>
+              Pour importer un fichier csv, le fichier d'origine doit respecter les paramètres suivants :
+              <ul>
+                <li>- Virgule, tabulation ou point-virgule pour séparer des valeurs.</li>
+                <li>- SRS WGS84 est implicite.</li>
+                <li>- Seuls les points géométriques sont importés. L'importation se référera au titre dans les entêtes de colonnes de «lat» et «lon» au début de l'en-tête, et est insensible à la casse. Toutes les autres colonnes sont importées en tant que propriétés.</li>
+              </ul>
+              </br>
+              <b>Attention :</b> l'outil n'est pas un outil de géomatique, il ne permet pas de réaliser de géotraitement sur les données importées. Si vous souhaitez afficher des données comprenant une analyse, vous devez réaliser l'analyse en amont dans un logiciel du type QGis, travailler la symbologie et réaliser un export des données avec la symbologie intégrée pour ensuite l'importer dans le POC.
+              </br>
+              <i>Appuyer sur suivant pour continuer</i>`,
+              showPrev: false,
+              // style: 'padding-right: 500px;',
+              anchor: 'corner-bottom-left'
+            },
+            {
+              name: 'import-paste-textarea',
+              // importer dialog - textarea
+              selector: '.umap-import textarea',
+              title: "Coller des données",
+              text: `La fonctionnalité Coller vos données ici permet d'utiliser un simple copier/coller de vos données, les formats de données possibles sont :
+              <ul>
+                <li>- geojson</li>
+                <li>- csv</li>
+                <li>- gpx</li>
+                <li>- kml</li>
+              </ul>
+              </br>
+              Pour copier/coller un fichier csv, le fichier d'origine doit respecter les mêmes paramètres que pour l'import de fichiers locaux.
+              </br></br>
+              <b>Attention :</b> l'outil n'est pas un outil de géomatique, il ne permet pas de réaliser de géotraitement sur les données importées. Si vous souhaitez afficher des données comprenant une analyse, vous devez réaliser l'analyse en amont dans un logiciel du type QGis, travailler la symbologie et réaliser un export des données avec la symbologie intégrée pour ensuite l'importer dans le POC.
+              </br>
+              <i>Appuyer sur suivant pour continuer</i>`,
+              showPrev: false,
+              anchor: 'corner-bottom-left'
+            },
+            {
+              name: 'import-url-input',
+              // importer dialog - URL input
+              selector: '.umap-import input[type="url"]',
+              title: "Importer des données distantes",
+              text: `Vous pouvez aussi coller l'URL de données distantes
+              </br>
+              <i>Appuyer sur suivant pour continuer</i>`,
+              showPrev: false,
+              anchor: 'corner-bottom-left'
+            },
+            {
+              name: 'import-assistants-button',
+              // importer dialog - importers button (assistants)
+              selector: '.umap-import button.importers[data-ref="importersButton"]',
+              title: "Assistants d'import",
+              text: `Enfin, vous pouvez utilisez les assistants d'import pour faciliter l'import de certaines données sélectionnées.
+              </br></br>
+              Cliquez sur le bouton <b>Assistants d'import</b> pour ouvrir la fenêtre des assistants disponibles.
+              </br>
+              <i>Pour réaliser l'action décrite, cliquez sur la fonctionnalité en surbrillance (cadre jaune/orange)</i>`,
               showNext: false,
               showPrev: false,
-              anchor: 'center-bottom'
+              anchor: 'corner-bottom-left'
             },
             {
+              name: 'importers-grid',
+              // importer dialog
+              selector: '.umap-dialog.window.importers, .importers.dialog, .umap-importers, .umap-dialog.importers',
+              title: "Assistants d'import",
+              text: `<b>Les assistants d'import</b> permettent de charger sur la carte des données contenues dans l'outil. Ces données sont classées selon différentes catégories :
+              </br>
+              <ul>
+                <li>- Contours des communes</li>
+                <li>- Données d'exposition (données décrivant le climat)</li>
+                <li>- Données de contexte (ex : les populations)</li>
+                <li>- Données bleues (données relatives à l'eau)</li>
+                <li>- Données grises (données relatives au contexte urbain)</li>
+                <li>- Données vertes (données relatives à la végétation)</li>
+                <li>- Données issues de la base de données Openstreetmap</li>
+              </ul>
+              </br>
+              Sélectionnez un des assistants proposés pour ouvrir la fenêtre de sélection des données.`,
+              showNext: false,
+              showPrev: false,
+              anchor: 'corner-bottom-left'
+            },
+            {
+              name: 'importer-specific-dialog',
               // importer-specific dialog shown after selecting a helper
               selector: '.umap-dialog.window.importer, .umap-dialog.window .importer, .importer.dialog, .overpass.importer, .datasets.importer, .geodatamine.importer',
               title: "Choisir les données",
               text: "Choisissez le jeu de données ou renseignez l'expression, puis validez en cliquant sur le bouton de confirmation.",
               showNext: false,
               showPrev: false,
-              anchor: 'bottom',
+              anchor: 'corner-bottom-left',
               nextLabel: 'Suivant',
             },
             {
+              name: 'import-submit-button',
               // final: the import panel submit button that performs the import
               selector: '.umap-import [name="submit"], .umap-import input[name="submit"]',
               title: "Importer les données",
-              text: "L'assistant a rempli automatiquement le formulaire, cliquez sur 'Importer des données' pour lancer l'import.",
+              text: `L'assistant a rempli automatiquement le formulaire, cliquez sur 'Importer des données' pour lancer l'import.
+              </br>
+              <i>Pour réaliser l'action décrite, cliquez sur la fonctionnalité en surbrillance (cadre jaune/orange)</i>`,
               showNext: false,
               showPrev: false,
-              anchor: 'center-left',
+              anchor: 'corner-bottom-left',
             },
             {
-              // explorer/data browser control highlight (now using the layers button)
-              selector: 'li[data-ref="layers"], li[data-ref="layers"] button',
-              title: "Explorateur de données",
-              text: "Ouvrez l'explorateur de données pour voir les calques et les jeux de données importés.",
-              anchor: 'center-left',
+              name: 'caption-button',
+              selector: 'li[data-ref="caption"] button, button[title="Modifier les propriétés de la carte"]',
+              title: "Autres fonctionnalités",
+              text: `Vous avez importé vos premières données, passons aux autres fonctionnalités.
+              </br></br>
+              Vous pouvez modifier les propriétés de la carte en cliquant sur le bouton "Modifier les propriétés de la carte".
+              </br></br>
+              <ul>
+                <li>- Donner un nom descriptif à la carte</li>
+                <li>- Ajouter une description</li>
+                <li>- Définir la licence d'utilisation</li>
+                <li>- Choisir le fond de carte approprié</li>
+              </ul>
+              </br>
+              <i>Appuyer sur suivant pour continuer</i>`,
+              anchor: 'corner-bottom-left',
+              showPrev: false,
+            },
+            {
+              name: 'tilelayers-button',
+              selector: 'li[data-ref="tilelayers"] button, button[title="Changer le fond de carte"]',
+              title: "Fonds de carte",
+              text: `3 fonds de carte sont disponibles à ce jour dans l'outil :
+              </br></br>
+              <ul>
+                <li>- <b>OpenStreetMap (permet d'avoir une vue cartographique de la zone (routes, bâtiments, cours d'eau, etc.)</b></li>
+                <li>- <b>Images satellites (permet d'avoir une vue réelle de la zone)</b></li>
+                <li>- <b>Simplifié (permet d'avoir le minimum d'informations essentielles)</b></li>
+              </ul>
+              </br>
+              <i>Appuyer sur suivant pour continuer</i>`,
+              anchor: 'corner-bottom-left',
+              showPrev: false,
+            },
+            {
+              name: 'permissions-button',
+              selector: 'li[data-ref="permissions"] button, button[title="Changer les permissions et les éditeurs"]',
+              title: "Permissions et partage",
+              text: `<b>Type de permission</b>
+              </br></br>
+              <table style="width:100%; border-collapse: collapse;">
+                <tr>
+                  <td style="padding: 5px;"><b>Édition</b></td>
+                  <td style="padding: 5px;">Seul le créateur / Éditeurs nommés / Tous les utilisateurs connectés / Tout le monde (anonyme)</td>
+                </tr>
+                <tr>
+                  <td style="padding: 5px;"><b>Consultation</b></td>
+                  <td style="padding: 5px;">Publique / Avec le lien seulement / Éditeurs uniquement</td>
+                </tr>
+              </table>
+              </br>
+              <b>Recommandation :</b> Pour un travail collaboratif, définir des éditeurs nommés plutôt que d'ouvrir l'édition à tous.
+              </br>
+              <i>Appuyer sur suivant pour continuer</i>`,
+              anchor: 'corner-bottom-left',
+              showPrev: false,
+            },
+            {
+              name: 'advanced-properties-button',
+              selector: 'li[data-ref="settings"] button',
+              title: "Propriétés avancées de la carte",
+              text: `Cliquez sur ce bouton pour ouvrir les propriétés avancées de la carte et découvrir les options d'interface.
+              </br></br>
+              <i>Pour réaliser l'action décrite, cliquez sur la fonctionnalité en surbrillance (cadre jaune/orange)</i>`,
+              anchor: 'corner-bottom-left',
               showNext: false,
               showPrev: false,
             },
             {
+              name: 'interface-options',
+              selector: 'div[data-highlight="settings"] details:first-of-type summary',
+              title: "Options d'interface",
+              text: `Les options proposées peuvent s'afficher dans la barre d'outils verticale à gauche de la carte.
+              </br></br>
+              Vous pouvez choisir de les afficher :
+              <ul>
+                <li>- <b>Toujours</b></li>
+                <li>- <b>Jamais</b></li>
+                <li>- <b>Caché</b> (elles apparaissent si vous cliquez sur la petite flèche grise)</li>
+              </ul>
+              </br>
+              <i>Appuyer sur suivant pour continuer</i>`,
+              anchor: 'corner-bottom-left',
+              showPrev: false,
+            },
+            {
+              name: 'default-shape-properties',
+              selector: 'div[data-highlight="settings"] details:nth-of-type(2) summary',
+              title: "Propriétés de forme par défaut",
+              text: `<b>Symbologie</b>
+              </br></br>
+              Choisir les couleurs et les épaisseurs de traits
+              </br>
+              <i>Appuyer sur suivant pour continuer</i>`,
+              anchor: 'corner-bottom-left',
+              showPrev: false,
+            },
+            {
+              name: 'default-interaction-options',
+              selector: 'div[data-highlight="settings"] details:nth-of-type(4) summary',
+              title: "Options d'interaction par défaut",
+              text: `<b>Pop-ups et interactions</b>
+              </br></br>
+              Chaque objet peut afficher une pop-up contenant :
+              <ul>
+                <li>- Titre et description en texte enrichi</li>
+                <li>- Images et médias</li>
+                <li>- Liens hypertextes</li>
+                <li>- Variables dynamiques (propriétés de l'objet)</li>
+              </ul>
+              </br>
+              <i>Appuyer sur suivant pour continuer</i>`,
+              anchor: 'corner-bottom-left',
+              showPrev: false,
+            },
+            {
+              name: 'slideshow-options',
+              selector: 'div[data-highlight="settings"] details:nth-of-type(6) summary',
+              title: "Diaporama",
+              text: `Créer un parcours guidé à travers les différents objets de la carte avec navigation automatique.
+              </br>
+              <i>Appuyer sur suivant pour continuer</i>`,
+              anchor: 'corner-bottom-left',
+              showPrev: false,
+            },
+            {
+              name: 'advanced-actions',
+              selector: 'div[data-highlight="settings"] details:nth-of-type(7) summary',
+              title: "Actions avancées",
+              text: `<b>Export des données</b>
+              </br></br>
+              Les données de la carte peuvent être exportées dans plusieurs formats :
+              <ul>
+                <li>- <b>GeoJSON</b> - Format complet avec toutes les propriétés</li>
+                <li>- <b>gpx</b> - Pour utilisation GPS</li>
+                <li>- <b>kml</b> - Compatible Google Earth</li>
+                <li>- <b>csv</b> - Format texte</li>
+                <li>- <b>jpg</b> - Format image</li>
+                <li>- <b>png</b> - Format image</li>
+              </ul>
+              </br>
+              <b>Intégration dans un site web</b>
+              </br></br>
+              uMap génère automatiquement un code iframe pour intégrer la carte :
+              <ul>
+                <li>- Cliquer sur l'icône de partage</li>
+                <li>- Copier le code iframe généré</li>
+                <li>- Coller le code dans le HTML de votre page</li>
+              </ul>
+              </br>
+              <b>Options d'intégration :</b>
+              <ul>
+                <li>- Largeur et hauteur personnalisables</li>
+                <li>- Affichage du panneau latéral</li>
+                <li>- Zoom initial et centrage</li>
+              </ul>
+              </br>
+              <i>Appuyer sur suivant pour continuer</i>`,
+              anchor: 'corner-bottom-left',
+              showPrev: false,
+            },
+            {
+              name: 'couche-explain',
+              selector: 'li[data-ref="layers"] button, li[data-ref="layers"]',
+              title: "Les couches de données",
+              text: `Les couches de données (ou calques) permettent d'organiser les objets géographiques de manière thématique. Chaque couche peut avoir ses propres propriétés d'affichage et de style.
+              </br></br>
+              <b>Avantages des couches :</b>
+              <ul>
+                <li>- Organisation logique des données</li>
+                <li>- Activation/désactivation sélective de l'affichage</li>
+                <li>- Application de styles différenciés par thématique</li>
+              </ul>
+              </br></br>
+              Ouvrez l'explorateur de données pour voir les couches et les jeux de données importés.
+              </br></br>
+              <i>Pour réaliser l'action décrite, cliquez sur la fonctionnalité en surbrillance (cadre jaune/orange)</i>`,
+              anchor: 'corner-bottom-left',
+              showNext: false,
+              showPrev: false,
+            },
+            {
+              name: 'edit-layer',
               // highlight the edit button for the first layer once explorer opened
               selector: '.umap-browser .feature:first-of-type .icon-edit, .umap-browser .feature:first-of-type [data-ref="edit"], .umap-panel .feature:first-of-type .icon-edit, .umap-browser li .icon-edit, .umap-browser button.icon-edit, .umap-panel button.icon-edit, ul[data-ref="ul"] li .icon-edit',
-              title: "Modifier le calque",
-              text: "Cliquez sur ce bouton pour modifier le calque que vous venez d'importer.",
-              anchor: 'center-left',
+              title: "Modifier une couche de données",
+              text: `Cliquez sur ce bouton pour modifier la couche que vous venez d'importer.
+              </br>
+              <i>Pour réaliser l'action décrite, cliquez sur la fonctionnalité en surbrillance (cadre jaune/orange)</i>`,
+              anchor: 'corner-bottom-left',
               showNext: false,
               showPrev: false,
             },
             {
+              name: 'layer-properties',
               // final step: highlight the layer/feature properties popup so the
               // user sees the parameters panel. Match known containers/ids.
               selector: '#umap-feature-shape-properties, .umap-layer-properties-container, .umap-feature-container, .umap-edit-panel .umap-layer-properties-container, .umap-edit-panel #umap-feature-shape-properties',
               title: "Paramètres d'affichage",
-              text: "Vous avez accès ici aux paramètres permettant de modifier l'affichage des données sur la carte.",
-              anchor: 'center-left',
+              text: `<b>Styles des objets</b>
+              </br>
+              Pour chaque objet ou couche de données, il est possible de personnaliser :
+              <ul>
+                <li>- <b>Couleurs</b> : Contour et remplissage</li>
+                <li>- <b>Icônes</b> : Bibliothèque extensive d'icônes pour les marqueurs</li>
+                <li>- <b>Opacité</b> : Transparence des objets</li>
+                <li>- <b>Épaisseur</b> : Largeur des lignes</li>
+                <li>- <b>Formes</b> : Style des marqueurs (épingle, cercle, etc.)</li>
+              </ul>
+              </br>
+              <b>Pop-ups et interactions</b>
+              </br>
+              Chaque objet peut afficher une pop-up contenant :
+              <ul>
+                <li>- Titre et description en texte enrichi</li>
+                <li>- Images et médias</li>
+                <li>- Liens hypertextes</li>
+                <li>- Variables dynamiques (propriétés de l'objet)</li>
+              </ul>
+              </br>
+              <i>Le tutoriel est terminé !</i>
+              </br></br>
+              N'hésitez pas à consulter les boutons d'aides <span style="display:inline-block; width:16px; height:16px; background-color:#0078D7; color:white; border-radius:50%; text-align:center; line-height:16px; font-size:12px; font-weight:bold;">?</span> répartis dans l'interface pour obtenir des informations contextuelles.`,
+              anchor: 'corner-bottom-left',
               showPrev: false,
+              doneLabel: "Terminer le tutoriel",
             },
       ]
 
@@ -136,11 +427,14 @@
       // handlers; we just listen for clicks and advance the tour when needed.
       const importBtn = document.querySelector('.umap-main-edit-toolbox .importers, .umap-main-edit-toolbox [data-ref="importersButton"]')
       if (importBtn) {
-    importBtn.addEventListener('click', () => {
-          // Small timeout to let the importer dialog render
-          setTimeout(() => {
-      advanceOnce()
-          }, 250)
+        importBtn.addEventListener('click', () => {
+          // Only advance if we're on the click-import-button step
+          if (tour.isCurrentStep('click-import-button')) {
+            // Small timeout to let the importer dialog render
+            setTimeout(() => {
+              advanceOnce()
+            }, 250)
+          }
         })
       }
 
@@ -151,7 +445,14 @@
           if (layersBtn && !layersBtn.__tutorialBound) {
             layersBtn.addEventListener('click', () => {
               try {
-                if (tour.index === 4) advanceOnce()
+                // Advance from couche-explain to couche-explain when button is clicked
+                if (tour.isCurrentStep('couche-explain')) {
+                  tour.advanceIfCurrentStep('couche-explain')
+                }
+                // Or advance from couche-explain to edit-layer
+                else if (tour.isCurrentStep('couche-explain')) {
+                  tour.advanceIfCurrentStep('couche-explain')
+                }
               } catch (err) { console.log('[Tutorial] layersBtn advance failed', err) }
             })
             layersBtn.__tutorialBound = true
@@ -163,6 +464,31 @@
       const layersMo = new MutationObserver((mutations) => { attachLayersHandler() })
       layersMo.observe(document.body, { childList: true, subtree: true })
 
+      // Listen for the assistants button inside .umap-import to advance from
+      // import-assistants-button to importers-grid
+      const attachAssistantsHandler = () => {
+        try {
+          const assistantsBtn = document.querySelector('.umap-import button.importers[data-ref="importersButton"]')
+          if (assistantsBtn && !assistantsBtn.__tutorialAssistantsBound) {
+            assistantsBtn.addEventListener('click', () => {
+              try {
+                // Only advance if we're on the import-assistants-button step
+                if (tour.isCurrentStep('import-assistants-button')) {
+                  setTimeout(() => {
+                    advanceOnce()
+                  }, 150)
+                }
+              } catch (err) { console.log('[Tutorial] assistantsBtn advance failed', err) }
+            })
+            assistantsBtn.__tutorialAssistantsBound = true
+          }
+        } catch (err) { /* ignore */ }
+      }
+      attachAssistantsHandler()
+      // fallback: watch for assistants button insertion
+      const assistantsMo = new MutationObserver((mutations) => { attachAssistantsHandler() })
+      assistantsMo.observe(document.body, { childList: true, subtree: true })
+
       // Delegated click handler: when a helper button in the importers grid
       // is clicked (including clicks on inner icons/labels), the
       // importer-specific dialog will open; advance the tour. Use
@@ -170,7 +496,7 @@
       // a known importers grid/dialog container before advancing.
       document.addEventListener('click', (e) => {
         // only act when we're on the importers-grid step
-        if (tour.index !== 1) return
+        if (!tour.isCurrentStep('importers-grid')) return
         // find the nearest actionable element (button/link)
         const actionEl = e.target && e.target.closest && e.target.closest('button, a, [role="button"]')
         if (!actionEl) return
@@ -179,7 +505,7 @@
         if (gridContainer) {
           // tiny delay to let the importer.open() process and dialog content update
           setTimeout(() => {
-            if (tour.index === 1) advanceOnce()
+            tour.advanceIfCurrentStep('importers-grid')
           }, 80)
         }
       })
@@ -190,14 +516,48 @@
         for (const m of mutations) {
           for (const node of m.addedNodes) {
             if (!(node instanceof HTMLElement)) continue
-            if (node.matches && node.matches('.umap-dialog.window.importers, .importers.dialog, .umap-importers, .umap-dialog.importers')) {
-              // Advance only if we're on the first step
-              if (tour.index === 0) advanceOnce()
+            // Check for the main import panel (.umap-import)
+            if (node.matches && node.matches('.umap-import')) {
+              tour.advanceIfCurrentStep('click-import-button')
             }
-            // importer-specific dialog (opened after selecting a helper)
-            if (node.matches && node.matches('.umap-dialog.window.importer, .umap-dialog.window .importer, .importer.dialog, .overpass.importer, .datasets.importer')) {
-              // Advance only if we're on the importer-grid step
-              if (tour.index === 1) advanceOnce()
+            // Also check if the node contains .umap-import
+            if (node.querySelector && node.querySelector('.umap-import')) {
+              tour.advanceIfCurrentStep('click-import-button')
+            }
+            // Check for importers grid fieldset (assistants page) - only advance if on import-assistants-button
+            if (tour.isCurrentStep('import-assistants-button')) {
+              if (node.matches && node.matches('fieldset[data-ref="fieldset"]')) {
+                const gridEl = node.querySelector && node.querySelector('.grid-container, [data-ref="grid"]')
+                if (gridEl) {
+                  advanceOnce()
+                  return
+                }
+              }
+              // Also check if node contains the importers grid
+              if (node.querySelector && node.querySelector('fieldset[data-ref="fieldset"] .grid-container, fieldset[data-ref="fieldset"] [data-ref="grid"]')) {
+                advanceOnce()
+                return
+              }
+              // Check for the importers dialog container
+              if (node.matches && node.matches('.umap-dialog.window.importers, .importers.dialog, .umap-importers, .umap-dialog.importers')) {
+                advanceOnce()
+                return
+              }
+            }
+            // importer-specific dialog (opened after selecting a helper) - only detect if on importers-grid step
+            if (tour.isCurrentStep('importers-grid')) {
+              if (node.matches && node.matches('.umap-dialog.window.importer, .umap-dialog.window .importer, .importer.dialog')) {
+                // Make sure it's not the importers grid itself
+                if (!node.matches('.umap-dialog.window.importers, .importers.dialog, .umap-importers, .umap-dialog.importers')) {
+                  advanceOnce()
+                  return
+                }
+              }
+              // Check for specific importer classes
+              if (node.matches && node.matches('.overpass.importer, .datasets.importer, .geodatamine.importer, .communesfr.importer')) {
+                advanceOnce()
+                return
+              }
             }
           }
         }
@@ -205,9 +565,8 @@
       // Also observe for nodes added inside existing dialogs: some importers
       const innerObserver = new MutationObserver((mutations) => {
         for (const m of mutations) {
-          // if content was added to a dialog template while we're on step 2,
-          // advance to step 3.
-          if (tour.index !== 1) continue
+          // if content was added to a dialog template while we're on importers-grid step
+          if (!tour.isCurrentStep('importers-grid')) continue
           for (const node of m.addedNodes) {
             if (!(node instanceof HTMLElement)) continue
             // check for importer-specific markers
@@ -222,15 +581,15 @@
       innerObserver.observe(document.body, { childList: true, subtree: true })
       observer.observe(document.body, { childList: true, subtree: true })
 
-      // Watcher: when we reach importer-specific dialog (step index 2), wait
+      // Watcher: when we reach importer-specific dialog step, wait
       // for the helper to populate the import panel (URL or enabled submit) and
-      // then advance the tour to highlight the import button (step index 3).
+      // then advance the tour to highlight the import button.
       let _importPopulatePoll = null
       const startImportPopulateWatcher = () => {
         if (_importPopulatePoll) return
         _importPopulatePoll = setInterval(() => {
-          // stop if user left the importer dialog step
-          if (tour.index !== 2) {
+          // stop if user left the importer-specific-dialog step
+          if (!tour.isCurrentStep('importer-specific-dialog')) {
             clearInterval(_importPopulatePoll)
             _importPopulatePoll = null
             return
@@ -240,29 +599,23 @@
           if ((urlInput && urlInput.value) || (submitBtn && !submitBtn.disabled)) {
             clearInterval(_importPopulatePoll)
             _importPopulatePoll = null
-            // Advance to the final step (import button)
+            // Advance to the import submit button step
             advanceOnce()
           }
         }, 150)
       }
 
-      // Start watcher when the tour reaches step index 2.
+      // Start watcher when the tour reaches importer-specific-dialog step
       const tourIndexChecker = setInterval(() => {
-        if (tour.index === 2) startImportPopulateWatcher()
+        if (tour.isCurrentStep('importer-specific-dialog')) startImportPopulateWatcher()
       }, 200)
 
-      // Advance to final informational step when the user clicks the import submit button.
+      // Advance to couche-explain step when the user clicks the import submit button.
       document.addEventListener('click', (e) => {
         const btn = e.target.closest && e.target.closest('.umap-import [name="submit"], .umap-import input[name="submit"]')
-          if (btn) {
-          // allow natural import flow to start, then advance one step to the
-          // informational/post-import step so the explorer step remains until
-          // user action.
-          setTimeout(() => {
-            try {
-              advanceOnce()
-            } catch (err) { console.log('[Tutorial] failed to advance to next step', err) }
-          }, 120)
+        if (btn && tour.isCurrentStep('import-submit-button')) {
+          // Don't advance here - let the success alert handle it
+          // This prevents double-advancing
         }
       })
 
@@ -272,20 +625,61 @@
         const { level = 'info', message = '' } = event.detail || {}
         // consider success-level alerts only
         if (level === 'success') {
-          // If we're on or before the post-import informational step, only
-          // advance one step (to the explorer control).
+          // Advance from import-submit-button to caption-button
           try {
-            // ensure we don't accidentally jump more than one step and
-            // never advance past the last defined step
-            advanceOnce()
+            tour.advanceIfCurrentStep('import-submit-button')
           } catch (err) { console.log('[Tutorial] onAlert advance failed', err) }
         }
       }
       document.addEventListener('umap:alert', onAlert)
 
+      // Attach handler to settings button: when clicked on advanced-properties-button step,
+      // wait for the settings panel to appear, then advance to interface-options step
+      const attachSettingsHandler = () => {
+        try {
+          const settingsBtn = document.querySelector('li[data-ref="settings"] button')
+          if (settingsBtn && !settingsBtn.__tutorialSettingsBound) {
+            settingsBtn.addEventListener('click', () => {
+              if (tour.isCurrentStep('advanced-properties-button')) {
+                // Wait for the settings panel to appear
+                setTimeout(() => {
+                  const settingsPanel = document.querySelector('div[data-highlight="settings"]')
+                  if (settingsPanel) {
+                    advanceOnce()
+                  }
+                }, 150)
+              }
+            })
+            settingsBtn.__tutorialSettingsBound = true
+          }
+        } catch (err) { /* ignore */ }
+      }
+      attachSettingsHandler()
+
+      // Also observe for the settings panel appearing (in case it's opened by other means)
+      const settingsObserver = new MutationObserver((mutations) => {
+        if (!tour.isCurrentStep('advanced-properties-button')) return
+        for (const m of mutations) {
+          for (const node of m.addedNodes) {
+            if (!(node instanceof HTMLElement)) continue
+            // Check if this is the settings panel
+            if (node.matches && node.matches('div[data-highlight="settings"]')) {
+              advanceOnce()
+              return
+            }
+            // Also check if node contains the settings panel
+            if (node.querySelector && node.querySelector('div[data-highlight="settings"]')) {
+              advanceOnce()
+              return
+            }
+          }
+        }
+      })
+      settingsObserver.observe(document.body, { childList: true, subtree: true })
+
       // Listen for clicks on the edit button in the browser list. When the
-      // user clicks edit for the first layer (tour step index for edit is 5),
-      // advance to the final informational step (which has no highlight).
+      // user clicks edit for the first layer on the edit-layer step,
+      // advance to the final layer-properties step.
       const editSelector = '.umap-browser .feature:first-of-type .icon-edit, .umap-browser .feature:first-of-type [data-ref="edit"], .umap-panel .feature:first-of-type .icon-edit, .umap-browser li .icon-edit, .umap-browser button.icon-edit, .umap-panel button.icon-edit, ul[data-ref="ul"] li .icon-edit'
       const attachEditHandler = () => {
         try {
@@ -293,12 +687,8 @@
           if (editBtn && !editBtn.__tutorialEditBound) {
             editBtn.addEventListener('click', () => {
               try {
-                // If we're currently on the edit-highlight step (index 5),
-                // advance to the final informational step (index 6) which
-                // uses noHighlight and ends the tour after user reads it.
-                if (tour.index === 5) {
-                  advanceOnce()
-                }
+                // If we're currently on the edit-layer step, advance to layer-properties
+                tour.advanceIfCurrentStep('edit-layer')
               } catch (err) { console.log('[Tutorial] editBtn advance failed', err) }
             })
             editBtn.__tutorialEditBound = true

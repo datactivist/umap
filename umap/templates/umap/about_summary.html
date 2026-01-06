@@ -32,47 +32,40 @@
 
 <div class="wrapper about_summary  highlights">
   <div class="row">
-    <div class="col quarter mwide">
+    <div class="col quarter mwide" id="umap">
       <img class="colophon"
            src="{% static 'umap/vendors/dsfr/icons/map/road-map-line.svg' %}"
            alt=""
            width="128px"
            height="128px" />
       <p>
-        {% blocktrans with osm_url="http://osm.org" %}uMap lets you create maps with <a href="{{ osm_url }}" />OpenStreetMap</a> layers in a minute and embed them in your site.{% endblocktrans %}
+        Je veux accéder à une carte existante.<br>
+        Je cherche cette carte dans la barre de recherche
       </p>
     </div>
-    <div class="col umap-features-list half mwide">
+    <div class="col umap-features-list half mwide" id="features">
       <img class="colophon"
            src="{% static 'umap/vendors/dsfr/icons/design/pencil-line.svg' %}"
            alt=""
            width="128px"
            height="128px" />
-      <ul>
-        <li>
-          {% trans "Choose the layers of your map" %}
-        </li>
-        <li>
-          {% trans "Add POIs: markers, lines, polygons..." %}
-        </li>
-        <li>
-          {% trans "Manage POIs colours and icons" %}
-        </li>
-        <li>
-          {% trans "Manage map options: display a minimap, locate user on load…" %}
-        </li>
-        <li>
-          {% trans "Batch import geostructured data (geojson, gpx, kml, osm...)" %}
-        </li>
-        <li>
-          {% trans "Choose the license for your data" %}
-        </li>
-        <li>
-          {% trans "Embed and share your map" %}
-        </li>
-      </ul>
+
+      <p>
+        Je veux créer une carte, je clique sur le bouton “Créer une carte”.<br>
+        J'ai la possibilité de :
+        <ul>
+          <li>Importer des données proposées par défaut dans l'outil</li>
+          <li>Importer des données locales</li>
+          <li>Importer des données via une URL</li>
+          <li>Choisir un fond de carte</li>
+          <li>Choisir la couleur et les icônes</li>
+          <li>Gérer les couches de données</li>
+          <li>Choisir la licence de vos données importées</li>
+          <li>Exporter et partager votre carte</li>
+        </ul>
+      </p>    
     </div>
-    <div class="col quarter mwide">
+    <div class="col quarter mwide" id="opensource">
       <img class="colophon"
            src="{% static 'umap/vendors/dsfr/icons/system/lock-unlock-line.svg' %}"
            alt=""

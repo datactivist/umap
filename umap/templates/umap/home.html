@@ -54,8 +54,34 @@
     document.addEventListener('DOMContentLoaded', () => {
       console.log('home: DOMContentLoaded (tutorial init)')
       const steps = [
-        { selector: '#nav-login-link', title: 'Se connecter', text: 'Connectez-vous pour pouvoir sauvegarder et gérer vos cartes.', nextLabel: 'Continuer sans se connecter' },
-        { selector: '#create-map-btn', title: 'Créer une carte', text: 'Appuyez sur le bouton "Créer une carte" pour commencer à créer votre première carte.' },
+              { 
+                selector: '#nav-login-link', 
+                title: 'Se connecter', 
+                text: `
+                <b>Recommandation :</b> Bien qu'il soit possible de créer une carte sans compte, il est fortement conseillé de s'identifier pour pouvoir retrouver, modifier et gérer ses cartes facilement.
+                </br></br>
+                <b>Étapes :</b>
+                <ul>
+                  <li>- Se rendre sur <a href=https://umap.datactivist.coop/fr/>https://umap.datactivist.coop/fr/</a></li>
+                  <li>- Cliquer sur "Connexion / Créer un compte"</li>
+                  <li>- Choisir une méthode d'authentification (openstreetmap recommandé, vous devez créer un compte openstreetmap)</li>
+                  <li>- Autoriser l'outil à accéder à votre compte</li>
+                </ul>
+                </br></br>
+                <i>Pour réaliser l'action décrite, cliquez sur la fonctionnalité en surbrillance (cadre jaune/orange)</i>`, 
+                nextLabel: 'Continuer sans se connecter',
+                anchor: "corner-bottom-left" 
+              },
+              { 
+                selector: '#create-map-btn', 
+                title: 'Créer une carte', 
+                text: `
+                <b>Cliquer sur le bouton "Créer une carte".</b> 
+                </br> Une carte vierge s'affiche avec les contrôles d'édition activés.
+                </br></br>
+                <i>Pour réaliser l’action décrite, cliquez sur la fonctionnalité en surbrillance (cadre jaune/orange)</i>`,
+                anchor: "corner-bottom-left" 
+              },
       ]
 
       const tutorialKey = 'umapTutorialActive'

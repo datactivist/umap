@@ -47,7 +47,23 @@ export class Importer {
       if (dataset.geographic_query) option.dataset.geographic_query = dataset.geographic_query
       else if (dataset.geographicQuery) option.dataset.geographic_query = dataset.geographicQuery
       if (dataset.expression) option.dataset.expression = dataset.expression
+      // Store source and description if provided
+      if (dataset.source) option.dataset.source = dataset.source
+      if (dataset.description) option.dataset.description = dataset.description
     }
+
+    // --- Source and Description info boxes ---
+    const sourceLabel = DomUtil.element({ tagName: 'div', parent: container, className: 'dataset-info' })
+    sourceLabel.style.display = 'none'
+    sourceLabel.style.marginTop = '10px'
+    const sourceTitle = DomUtil.element({ tagName: 'strong', textContent: 'Source : ', parent: sourceLabel })
+    const sourceLink = DomUtil.element({ tagName: 'a', parent: sourceLabel, target: '_blank' })
+    
+    const descLabel = DomUtil.element({ tagName: 'div', parent: container, className: 'dataset-info' })
+    descLabel.style.display = 'none'
+    descLabel.style.marginTop = '10px'
+    const descTitle = DomUtil.element({ tagName: 'strong', textContent: 'Description : ', parent: descLabel })
+    const descText = DomUtil.element({ tagName: 'span', parent: descLabel })
 
     // --- Area autocomplete (for OSM) ---
     const label = DomUtil.element({ tagName: 'label', id: 'area', parent: container })
@@ -76,6 +92,7 @@ export class Importer {
 
     // --- umap-data filter selector ---
     const geoSelectLabel = DomUtil.element({ tagName: 'label', id: 'geo_select_label', parent: container })
+    DomUtil.element({ tagName: 'br', parent: geoSelectLabel })
     DomUtil.element({ tagName: 'span', textContent: 'Sélectionne la zone géographique', parent: geoSelectLabel })
     const geoSelect = DomUtil.create('select', '', geoSelectLabel)
     geoSelectLabel.style.display = 'none'
@@ -91,6 +108,19 @@ export class Importer {
       label.style.display = 'none'
       tagsInput.value = ''
       geoSelectLabel.style.display = 'none'
+      sourceLabel.style.display = 'none'
+      descLabel.style.display = 'none'
+
+      // Show source and description if available
+      if (option && option.dataset && option.dataset.source) {
+        sourceLink.href = option.dataset.source
+        sourceLink.textContent = option.dataset.source
+        sourceLabel.style.display = 'block'
+      }
+      if (option && option.dataset && option.dataset.description) {
+        descText.textContent = option.dataset.description
+        descLabel.style.display = 'block'
+      }
 
       if (fmt === 'osm') {
         overpassContainer.style.display = ''

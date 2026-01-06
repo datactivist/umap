@@ -1173,7 +1173,9 @@ export default class Umap {
     this._editShapeProperties(container)
     this._editDefaultProperties(container)
     this._editInteractionsProperties(container)
-    this.rules.edit(container)
+    if (!document.body.classList.contains('simplified-mode')) {
+      this.rules.edit(container)
+    }
     this._editTilelayer(container)
     this._editOverlay(container)
     this._editBounds(container)

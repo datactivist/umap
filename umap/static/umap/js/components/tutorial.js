@@ -19,8 +19,43 @@ class Tutorial {
     this.onKey = this.onKey.bind(this)
   }
 
+  // Get the current step name
+  getCurrentStepName() {
+    const step = this.steps[this.index]
+    return step ? step.name : null
+  }
+
+  // Check if current step has a specific name
+  isCurrentStep(stepName) {
+    return this.getCurrentStepName() === stepName
+  }
+
+  // Advance to next step only if current step matches expectedStepName
+  advanceIfCurrentStep(expectedStepName) {
+    if (this.isCurrentStep(expectedStepName)) {
+      this.next()
+      return true
+    }
+    return false
+  }
+
   start() {
     if (!this.steps || !this.steps.length) return
+    
+    // Check if this tutorial has been skipped
+    if (this.tourId) {
+      try {
+        const skippedKey = 'umapTutorialEnded_' + this.tourId
+        const isSkipped = window.localStorage && window.localStorage.getItem(skippedKey) === '1'
+        if (isSkipped) {
+          console.log('[Tutorial] skipped (key:', skippedKey, 'is set to 1); not starting')
+          return
+        }
+      } catch (err) {
+        console.log('[Tutorial] failed to check skip status', err)
+      }
+    }
+    
   console.log('[Tutorial] starting with', this.steps.length, 'steps')
     this.createOverlay()
     this.showStep(0)
@@ -41,6 +76,21 @@ class Tutorial {
   }
 
   showStep(i) {
+    // Check if this tutorial has been skipped before showing any step
+    if (this.tourId) {
+      try {
+        const skippedKey = 'umapTutorialEnded_' + this.tourId
+        const isSkipped = window.localStorage && window.localStorage.getItem(skippedKey) === '1'
+        if (isSkipped) {
+          console.log('[Tutorial] skipped (key:', skippedKey, 'is set to 1); not showing step')
+          this.cleanup()
+          return
+        }
+      } catch (err) {
+        console.log('[Tutorial] failed to check skip status', err)
+      }
+    }
+    
     if (i < 0) i = 0
     if (i >= this.steps.length) return this.end()
     this.index = i
@@ -204,9 +254,31 @@ class Tutorial {
     const panelW = panelRect.width || 520
     const panelH = panelRect.height || 140
     const anchor = (step.anchor || 'right-top').toLowerCase()
+    const pad = 8
 
     let left, top
-    if (target) {
+    
+    // Handle corner anchors (anchored to viewport corners)
+    if (anchor.startsWith('corner-')) {
+      switch (anchor) {
+        case 'corner-top-left':
+          left = window.scrollX + pad
+          top = window.scrollY + pad
+          break
+        case 'corner-top-right':
+          left = window.scrollX + vw - panelW - pad
+          top = window.scrollY + pad
+          break
+        case 'corner-bottom-left':
+          left = window.scrollX + pad
+          top = window.scrollY + vh - panelH - pad
+          break
+        case 'corner-bottom-right':
+          left = window.scrollX + vw - panelW - pad
+          top = window.scrollY + vh - panelH - pad
+          break
+      }
+    } else if (target) {
       const rect = target.getBoundingClientRect()
   console.log('[Tutorial] target rect', rect)
 
@@ -259,16 +331,35 @@ class Tutorial {
       top = window.scrollY + (vh - panelH) / 2
     }
 
-    // clamp to viewport with small padding
-    const pad = 8
-    left = Math.min(Math.max(left, window.scrollX + pad), window.scrollX + Math.max(vw - panelW - pad, pad))
-    top = Math.min(Math.max(top, window.scrollY + pad), window.scrollY + Math.max(vh - panelH - pad, pad))
+    // clamp to viewport with small padding (for non-corner anchors)
+    if (!anchor.startsWith('corner-')) {
+      left = Math.min(Math.max(left, window.scrollX + pad), window.scrollX + Math.max(vw - panelW - pad, pad))
+      top = Math.min(Math.max(top, window.scrollY + pad), window.scrollY + Math.max(vh - panelH - pad, pad))
+    }
 
-    this.panel.style.position = 'absolute'
+    // this.panel.style.position = 'absolute'
     this.panel.style.left = Math.round(left) + 'px'
     this.panel.style.top = Math.round(top) + 'px'
     this.panel.style.transform = ''
     this.panel.style.zIndex = 99999
+
+    // Apply custom styles from step definition if provided
+    if (step && step.style) {
+      // Apply custom styles to the fr-modal__body (the top-level content container)
+      const modalBody = this.panel.querySelector('.fr-modal__body')
+      if (modalBody) {
+        // Reset any previous custom styles
+        modalBody.removeAttribute('style')
+        // Apply step.style (can be a string like "margin-left: 10px; padding: 20px")
+        modalBody.style.cssText = step.style
+      }
+    } else {
+      // Clear any previous custom styles when step has no style
+      const modalBody = this.panel.querySelector('.fr-modal__body')
+      if (modalBody) {
+        modalBody.removeAttribute('style')
+      }
+    }
   console.log('[Tutorial] panel positioned at', this.panel.style.left, this.panel.style.top, 'anchor=', anchor)
     
   }
