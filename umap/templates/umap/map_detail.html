@@ -218,15 +218,23 @@
               title: "Permissions et partage",
               text: `<b>Type de permission</b>
               </br></br>
-              <table style="width:100%; border-collapse: collapse;">
-                <tr>
-                  <td style="padding: 5px;"><b>Édition</b></td>
-                  <td style="padding: 5px;">Seul le créateur / Éditeurs nommés / Tous les utilisateurs connectés / Tout le monde (anonyme)</td>
-                </tr>
-                <tr>
-                  <td style="padding: 5px;"><b>Consultation</b></td>
-                  <td style="padding: 5px;">Publique / Avec le lien seulement / Éditeurs uniquement</td>
-                </tr>
+              <table style="width: 100%; border-collapse: collapse; margin: 10px 0;">
+                <thead>
+                  <tr style="background-color: #f0f0f0;">
+                    <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Type</th>
+                    <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Options</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="border: 1px solid #ddd; padding: 8px;"><b>Édition</b></td>
+                    <td style="border: 1px solid #ddd; padding: 8px;">Seul le créateur / Éditeurs nommés / Tous les utilisateurs connectés / Tout le monde (anonyme)</td>
+                  </tr>
+                  <tr style="background-color: #f9f9f9;">
+                    <td style="border: 1px solid #ddd; padding: 8px;"><b>Consultation</b></td>
+                    <td style="border: 1px solid #ddd; padding: 8px;">Publique / Avec le lien seulement / Éditeurs uniquement</td>
+                  </tr>
+                </tbody>
               </table>
               </br>
               <b>Recommandation :</b> Pour un travail collaboratif, définir des éditeurs nommés plutôt que d'ouvrir l'édition à tous.
@@ -267,7 +275,7 @@
               name: 'default-shape-properties',
               selector: 'div[data-highlight="settings"] details:nth-of-type(2) summary',
               title: "Propriétés de forme par défaut",
-              text: `<b>Symbologie</b>
+              text: `<b>Symbologie (représentation visuelle)</b>
               </br></br>
               Choisir les couleurs et les épaisseurs de traits
               </br>
@@ -346,11 +354,37 @@
               text: `Les couches de données (ou calques) permettent d'organiser les objets géographiques de manière thématique. Chaque couche peut avoir ses propres propriétés d'affichage et de style.
               </br></br>
               <b>Avantages des couches :</b>
-              <ul>
-                <li>- Organisation logique des données</li>
-                <li>- Activation/désactivation sélective de l'affichage</li>
-                <li>- Application de styles différenciés par thématique</li>
-              </ul>
+              </br></br>
+              <table style="width: 100%; border-collapse: collapse; margin: 10px 0;">
+                <thead>
+                  <tr style="background-color: #f0f0f0;">
+                    <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Avantage</th>
+                    <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="border: 1px solid #ddd; padding: 8px;">Organisation</td>
+                    <td style="border: 1px solid #ddd; padding: 8px;">Séparer les données par thème pour une carte plus lisible</td>
+                  </tr>
+                  <tr style="background-color: #f9f9f9;">
+                    <td style="border: 1px solid #ddd; padding: 8px;">Lisibilité</td>
+                    <td style="border: 1px solid #ddd; padding: 8px;">Afficher uniquement les informations pertinentes selon le besoin</td>
+                  </tr>
+                  <tr>
+                    <td style="border: 1px solid #ddd; padding: 8px;">Flexibilité</td>
+                    <td style="border: 1px solid #ddd; padding: 8px;">Activer, désactiver ou réorganiser les couches facilement</td>
+                  </tr>
+                  <tr style="background-color: #f9f9f9;">
+                    <td style="border: 1px solid #ddd; padding: 8px;">Edition ciblée</td>
+                    <td style="border: 1px solid #ddd; padding: 8px;">Modifier une couche sans impacter les autres</td>
+                  </tr>
+                  <tr>
+                    <td style="border: 1px solid #ddd; padding: 8px;">Analyse</td>
+                    <td style="border: 1px solid #ddd; padding: 8px;">Croiser plusieurs couches pour révéler des relations spatiales</td>
+                  </tr>
+                </tbody>
+              </table>
               </br></br>
               Ouvrez l'explorateur de données pour voir les couches et les jeux de données importés.
               </br></br>
@@ -373,13 +407,47 @@
             },
             {
               name: 'layer-properties',
-              // final step: highlight the layer/feature properties popup so the
+              // highlight the layer/feature properties popup so the
               // user sees the parameters panel. Match known containers/ids.
               selector: '#umap-feature-shape-properties, .umap-layer-properties-container, .umap-feature-container, .umap-edit-panel .umap-layer-properties-container, .umap-edit-panel #umap-feature-shape-properties',
               title: "Paramètres d'affichage",
-              text: `<b>Styles des objets</b>
+              text: `Un onglet s'ouvre alors, regroupant les paramètres disponibles pour la couche de données.
+              </br></br>
+              Dans le cadre de ce tutoriel, nous nous concentrerons sur les paramètres les plus importants, mais n'hésitez pas à les explorer par vous-même : il en existe beaucoup d'autres.
+              </br></br>
+              <i>Cliquez sur Suivant pour continuer.</i>`,
+              anchor: 'corner-bottom-left',
+              showPrev: false,
+            },
+            {
+              name: 'layer-display-type',
+              selector: 'select[name="type"][data-ref="select"]',
+              title: "Type d'affichage des données",
+              text: `Vous pouvez modifier le type d'affichage des données selon vos besoins :
+              </br></br>
+              <ul>
+                <li>- <b>Par défaut</b> : correspond au mode d'affichage défini lors de l'importation de la couche de données.</li>
+                <li>- <b>Cluster</b> : regroupe les points géographiquement proches afin de limiter l'encombrement visuel et d'améliorer les performances.</li>
+                <li>- <b>Heatmap</b> : représente la densité des données à l'aide de gradients de couleur, permettant d'identifier les zones de forte concentration.</li>
+                <li>- <b>Choroplèthe</b> : affiche les données agrégées par zones géographiques avec une variation de couleur proportionnelle aux valeurs associées.</li>
+                <li>- <b>Par catégories</b> : distingue les données selon une catégorie définie par l'utilisateur.</li>
+                <li>- <b>Cercles proportionnels</b> : utilise des cercles dont la taille est proportionnelle à la valeur représentée, permettant une comparaison visuelle des ordres de grandeur.</li>
+              </ul>
               </br>
-              Pour chaque objet ou couche de données, il est possible de personnaliser :
+              <b>Note :</b> Lorsque les données importées contiennent plus de 1.000 points, le mode Cluster est sélectionné par défaut afin d'optimiser les performances et la lisibilité de la carte.
+              </br></br>
+              <i>Cliquez sur Suivant pour continuer.</i>`,
+              anchor: 'corner-bottom-left',
+              showPrev: false,
+            },
+            {
+              name: 'layer-semiologie',
+              selector: '',
+              title: "Sémiologie - Styles des objets",
+              text: `<b>Styles des objets</b>
+              </br></br>
+              Pour chaque objet ou calque dont les objets géographiques sont des points, il est possible de personnaliser :
+              </br></br>
               <ul>
                 <li>- <b>Couleurs</b> : Contour et remplissage</li>
                 <li>- <b>Icônes</b> : Bibliothèque extensive d'icônes pour les marqueurs</li>
@@ -388,17 +456,38 @@
                 <li>- <b>Formes</b> : Style des marqueurs (épingle, cercle, etc.)</li>
               </ul>
               </br>
-              <b>Pop-ups et interactions</b>
-              </br>
-              Chaque objet peut afficher une pop-up contenant :
+              Il est également possible d'ajouter une icône personnalisée via une URL externe. (attention d'utiliser une URL stable afin de ne pas perdre le lien)
+              </br></br>
+              <i>Cliquez sur Suivant pour continuer.</i>`,
+              anchor: 'corner-bottom-left',
+              showPrev: false,
+            },
+            {
+              name: 'layer-popup-interactions',
+              selector: '',
+              title: "Pop-ups et interactions",
+              text: `<b>Pop-ups et interactions</b>
+              </br></br>
+              Vous pouvez modifier le comportement et l'apparence de ce pop-up depuis l'onglet "Options d'interaction"
+              </br></br>
+              Chaque objet peut afficher une popup contenant :
+              </br></br>
               <ul>
                 <li>- Titre et description en texte enrichi</li>
                 <li>- Images et médias</li>
                 <li>- Liens hypertextes</li>
                 <li>- Variables dynamiques (propriétés de l'objet)</li>
               </ul>
-              </br>
-              <i>Le tutoriel est terminé !</i>
+              </br></br>
+              <i>Cliquez sur Suivant pour continuer.</i>`,
+              anchor: 'corner-bottom-left',
+              showPrev: false,
+            },
+            {
+              name: 'tutorial-ended',
+              selector: '',
+              title: "Tutoriel terminé",
+              text: `Le tutoriel est terminé, vous pouvez le télécharger au format PDF sur le lien suivant : xxx
               </br></br>
               N'hésitez pas à consulter les boutons d'aides <span style="display:inline-block; width:16px; height:16px; background-color:#0078D7; color:white; border-radius:50%; text-align:center; line-height:16px; font-size:12px; font-weight:bold;">?</span> répartis dans l'interface pour obtenir des informations contextuelles.`,
               anchor: 'corner-bottom-left',

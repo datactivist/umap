@@ -9,13 +9,14 @@
           <div class="fr-btns-group fr-btns-group--center fr-btns-group--lg">
             {% if not UMAP_READONLY %}
               <div class="fr-btns-group__btn">
-                <a id="create-map-btn"
-                   href="{% url 'map_new' %}"
-                   class="fr-btn fr-btn--primary fr-btn--lg"
-                   role="button"
-                   aria-label="{% trans "Create a map" %}">
+                <button id="create-map-btn"
+                        type="button"
+                        class="fr-btn fr-btn--primary fr-btn--lg"
+                        aria-controls="tutorial-choice-modal"
+                        data-fr-opened="false"
+                        aria-label="{% trans "Create a map" %}">
                   {% trans "Create a map" %}
-                </a>
+                </button>
               </div>
             {% endif %}
             {% if demo_map %}
@@ -72,7 +73,10 @@
            width="128px"
            height="128px" />
       <p class="note">
-        {% blocktrans with repo_url="https://github.com/umap-project/umap" %}And it's <a href="{{ repo_url }}">open source</a>!{% endblocktrans %}
+        Et c'est un logiciel libre !<br />
+        Retrouvez le code source sur<br />
+        - <a href="https://github.com/datactivist/umap">Le code source de l'outil de visualisation (basé sur uMap)</a><br />
+        - <a href="https://github.com/datactivist/umap-data-api">Le code source de l'API de données</a><br />
       </p>
     </div>
   </div>

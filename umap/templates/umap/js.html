@@ -1,6 +1,10 @@
 {% load static %}
 
 {% autoescape off %}
+<!-- DSFR JavaScript - doit être chargé avant les autres scripts -->
+<script type="module" src="{% static 'umap/vendors/dsfr/dsfr.module.min.js' %}"></script>
+<script type="text/javascript" nomodule src="{% static 'umap/vendors/dsfr/dsfr.nomodule.min.js' %}"></script>
+
 <script type="module"
         src="{% static 'umap/vendors/leaflet/leaflet-src.esm.js' %}"
         defer></script>

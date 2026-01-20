@@ -36,6 +36,40 @@
     {% endif %}
   </div>
 
+  <!-- Modal DSFR pour le choix du tutoriel -->
+  <dialog id="tutorial-choice-modal" class="fr-modal" aria-labelledby="tutorial-choice-modal-title" aria-modal="true">
+    <div class="fr-container fr-container--fluid">
+      <div class="fr-grid-row fr-grid-row--center">
+        <div class="fr-col-12 fr-col-md-11 fr-col-lg-10">
+          <div class="fr-modal__body">
+            <div class="fr-modal__header">
+              <button class="fr-btn--close fr-btn" aria-controls="tutorial-choice-modal" title="Fermer" type="button">Fermer</button>
+            </div>
+            <div class="fr-modal__content">
+              <h1 id="tutorial-choice-modal-title" class="fr-modal__title">
+                Créer une nouvelle carte
+              </h1>
+              <p>Souhaitez-vous être guidé dans la création de votre carte ?</p>
+            </div>
+            <div class="fr-modal__footer">
+              <ul class="fr-btns-group fr-btns-group--right fr-btns-group--inline-reverse fr-btns-group--inline-lg">
+                <li>
+                  <button id="create-without-tutorial" class="fr-btn fr-btn--lg" type="button">
+                    🚀 Créer sans parcours guidé
+                  </button>
+                </li>
+                <li>
+                  <button id="create-with-tutorial" class="fr-btn fr-btn--primary fr-btn--lg" type="button">
+                    🎓 Créer avec un parcours guidé
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </dialog>
   
 {% endblock maincontent %}
 
@@ -55,21 +89,74 @@
       console.log('home: DOMContentLoaded (tutorial init)')
       const steps = [
               { 
-                selector: '#nav-login-link', 
-                title: 'Se connecter', 
+                selector: '', 
+                title: 'Recommandation', 
                 text: `
                 <b>Recommandation :</b> Bien qu'il soit possible de créer une carte sans compte, il est fortement conseillé de s'identifier pour pouvoir retrouver, modifier et gérer ses cartes facilement.
                 </br></br>
-                <b>Étapes :</b>
+                <table style="width: 100%; border-collapse: collapse; margin: 10px 0;">
+                  <thead>
+                    <tr style="background-color: #f0f0f0;">
+                      <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Fonctionnalité</th>
+                      <th style="border: 1px solid #ddd; padding: 8px; text-align: center;">👤 Utilisateur non connecté</th>
+                      <th style="border: 1px solid #ddd; padding: 8px; text-align: center;">🔐 Utilisateur connecté</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td style="border: 1px solid #ddd; padding: 8px;">Création d'une carte</td>
+                      <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">✅</td>
+                      <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">✅</td>
+                    </tr>
+                    <tr style="background-color: #f9f9f9;">
+                      <td style="border: 1px solid #ddd; padding: 8px;">Sauvegarde de la carte</td>
+                      <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">⚠️ Via un lien secret uniquement</td>
+                      <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">✅ Via le compte</td>
+                    </tr>
+                    <tr>
+                      <td style="border: 1px solid #ddd; padding: 8px;">Création d'équipes</td>
+                      <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">❌</td>
+                      <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">✅</td>
+                    </tr>
+                    <tr style="background-color: #f9f9f9;">
+                      <td style="border: 1px solid #ddd; padding: 8px;">Attribution des droits d'édition</td>
+                      <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">⚠️ Soit même ou tout le monde</td>
+                      <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">✅ Personnes spécifiques ou équipes</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <i>Appuyer sur suivant pour continuer</i>`, 
+                nextLabel: 'Suivant',
+                anchor: "corner-bottom-left" 
+              },
+              { 
+                selector: '#nav-login-link', 
+                title: 'Se connecter', 
+                text: `
+                <b>Les étapes pour se connecter :</b>
                 <ul>
-                  <li>- Se rendre sur <a href=https://umap.datactivist.coop/fr/>https://umap.datactivist.coop/fr/</a></li>
-                  <li>- Cliquer sur "Connexion / Créer un compte"</li>
-                  <li>- Choisir une méthode d'authentification (openstreetmap recommandé, vous devez créer un compte openstreetmap)</li>
-                  <li>- Autoriser l'outil à accéder à votre compte</li>
+                  <li>Se rendre sur <a href="https://umap.datactivist.coop/fr/">https://umap.datactivist.coop/fr/</a></li>
+                  <li>Cliquer sur "Connexion / Créer un compte"</li>
+                  <li>Choisir une méthode d'authentification (openstreetmap recommandé, vous devez créer un compte openstreetmap)</li>
+                  <li>Autoriser l'outil à accéder à votre compte</li>
                 </ul>
                 </br></br>
                 <i>Pour réaliser l'action décrite, cliquez sur la fonctionnalité en surbrillance (cadre jaune/orange)</i>`, 
+                showPrev: false,
                 nextLabel: 'Continuer sans se connecter',
+                anchor: "corner-bottom-left" 
+              },
+              { 
+                selector: '.fr-search-bar', 
+                title: 'Rechercher et consulter des cartes', 
+                text: `
+                <b>Il est possible de rechercher et de consulter les cartes créées par la communauté.</b>
+                </br></br>
+                Les cartes explicitement configurées comme "visibles par tous" par le créateur sont accessibles dans cet espace. Un utilisateur non connecté peut également y rendre sa carte publique.
+                </br></br>
+                <i>Pour continuer, cliquez sur "Suivant"</i>`,
+                showPrev: false,
+                nextLabel: 'Suivant',
                 anchor: "corner-bottom-left" 
               },
               { 
@@ -80,6 +167,7 @@
                 </br> Une carte vierge s'affiche avec les contrôles d'édition activés.
                 </br></br>
                 <i>Pour réaliser l’action décrite, cliquez sur la fonctionnalité en surbrillance (cadre jaune/orange)</i>`,
+                showPrev: false,
                 anchor: "corner-bottom-left" 
               },
       ]
@@ -125,14 +213,56 @@
         })
       }
 
+      // Gestion de la modal DSFR de choix du tutoriel
       const createBtn = document.querySelector('#create-map-btn')
+      const createWithTutorialBtn = document.querySelector('#create-with-tutorial')
+      const createWithoutTutorialBtn = document.querySelector('#create-without-tutorial')
+      const mapNewUrl = '{% url "map_new" %}'
+
+      // Le bouton ouvre la modale automatiquement via aria-controls
+      // On écoute juste le clic pour avancer le tutoriel si actif
       if (createBtn) {
         createBtn.addEventListener('click', () => {
-          console.log('home: create button clicked, advancing tutorial')
+          console.log('home: create button clicked, modal will open via DSFR')
+          // Avancer le tutoriel de la home si actif
           if (tour) tour.next()
         })
       } else {
         console.log('home: create button not found')
+      }
+
+      // Créer avec tutoriel
+      if (createWithTutorialBtn) {
+        createWithTutorialBtn.addEventListener('click', () => {
+          console.log('home: creating map with tutorial')
+          try {
+            // Activer le tutoriel global
+            localStorage.setItem(tutorialKey, '1')
+            // S'assurer que le tutoriel map n'est pas marqué comme terminé
+            localStorage.removeItem(endedPrefix + 'map')
+          } catch (err) {
+            console.log('[Tutorial] failed to set tutorial flags', err)
+          }
+          // Rediriger vers la création de carte
+          window.location.href = mapNewUrl
+        })
+      }
+
+      // Créer sans tutoriel
+      if (createWithoutTutorialBtn) {
+        createWithoutTutorialBtn.addEventListener('click', () => {
+          console.log('home: creating map without tutorial')
+          try {
+            // Désactiver le tutoriel global
+            localStorage.setItem(tutorialKey, '0')
+            // Marquer le tutoriel map comme terminé pour éviter l'auto-start
+            localStorage.setItem(endedPrefix + 'map', '1')
+          } catch (err) {
+            console.log('[Tutorial] failed to set tutorial flags', err)
+          }
+          // Rediriger vers la création de carte
+          window.location.href = mapNewUrl
+        })
       }
     })
   </script>

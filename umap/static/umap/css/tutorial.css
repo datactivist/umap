@@ -50,3 +50,11 @@
   /* ensure proxy doesn't add scrollbars */
   will-change: transform;
 }
+
+/* Fix DSFR modal width */
+dialog.fr-modal,
+dialog#tutorial-choice-modal {
+  max-width: 90vw !important;
+  width: 100% !important;
+}
+
