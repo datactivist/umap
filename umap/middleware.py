@@ -10,6 +10,25 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 
 
+def simple_password_middleware(get_response):
+    """Simple temporary password protection middleware."""
+    if not getattr(settings, "SIMPLE_PASSWORD_PROTECTION", None):
+        raise MiddlewareNotUsed
+
+    def middleware(request):
+        # Skip password check for the login page itself and static files
+        if request.path == "/simple-login/" or request.path.startswith("/static/"):
+            return get_response(request)
+        
+        # Check if user has authenticated with the simple password
+        if not request.session.get("simple_password_authenticated", False):
+            return HttpResponseRedirect("/simple-login/")
+        
+        return get_response(request)
+    
+    return middleware
+
+
 def readonly_middleware(get_response):
     if not settings.UMAP_READONLY:
         raise MiddlewareNotUsed

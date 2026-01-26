@@ -37,7 +37,7 @@ from django.http import (
     HttpResponseServerError,
 )
 from django.middleware.gzip import re_accepts_gzip
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.core.files.base import ContentFile
 from django.urls import resolve, reverse, reverse_lazy
 from django.utils import translation
@@ -48,6 +48,7 @@ from django.views.decorators.cache import cache_control
 from django.views.decorators.http import require_GET
 from django.views.generic import DetailView, TemplateView, View
 from django.views.generic.base import RedirectView
+from django.views.decorators.csrf import csrf_protect
 from django.views.generic.detail import BaseDetailView
 from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
 from django.views.generic.list import ListView
@@ -1564,3 +1565,26 @@ class TemplateList(ListView):
             for m in qs.order_by("-modified_at")
         ]
         return simple_json_response(templates=templates)
+
+
+@csrf_protect
+def simple_login_view(request):
+    """Simple password protection login view."""
+    if request.method == "POST":
+        password = request.POST.get("password", "")
+        correct_password = getattr(settings, "SIMPLE_PASSWORD_PROTECTION", None)
+        
+        if password == correct_password:
+            request.session["simple_password_authenticated"] = True
+            # Redirect to home page after successful login
+            next_url = request.GET.get("next", "/")
+            return HttpResponseRedirect(next_url)
+        else:
+            return render(
+                request, 
+                "umap/simple_login.html", 
+                {"error": "Incorrect password. Please try again."}
+            )
+    
+    return render(request, "umap/simple_login.html")
+

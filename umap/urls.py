@@ -23,6 +23,7 @@ from .utils import decorated_patterns
 admin.autodiscover()
 
 urlpatterns = [
+    re_path(r"^simple-login/$", views.simple_login_view, name="simple_login"),
     re_path(r"^admin/", admin.site.urls),
     re_path("", include("social_django.urls", namespace="social")),
     re_path(
