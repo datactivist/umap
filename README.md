@@ -36,7 +36,18 @@ Pour désactiver la protection, définissez `SIMPLE_PASSWORD_PROTECTION = None` 
 
 ### Sources de données pour l'import
 
-Les sources de données utilisées dans l'assistant d'import peuvent être définies dans le fichier de configuration `local_settings.py` d'uMap. Voici un exemple de configuration qui utilise entre autres l'API Overpass pour OpenStreetMap ainsi qu'une API développée pour notre cas d'usage :
+Les sources de données utilisées dans l'assistant d'import peuvent être définies dans le fichier de configuration `local_settings.py` d'uMap. 
+Dans la variable UMAP_IMPORTERS, il est possible d'ajouter des datasets provenant de l'API de données comme cela :
+{
+    "label": "Arbres (namR)",
+    "data": "arbres", # Nom de la clé dans l'API
+    "geographic_query": "commune", # Geographic filter in the API
+    "format": "umap-data",
+    "source": "https://www.data.gouv.fr/datasets/arbres-en-open-data-en-france-par-namr/",
+    "description": "Ce jeu de données concerne l’ensemble des arbres urbains référencés dans l’open data.",
+},
+
+Voici un exemple de configuration qui utilise entre autres l'API Overpass pour OpenStreetMap ainsi qu'une API développée pour notre cas d'usage :
 
 ```python
 UMAP_IMPORTERS = {
