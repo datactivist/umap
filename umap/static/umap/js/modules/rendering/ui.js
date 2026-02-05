@@ -121,7 +121,9 @@ const PointMixin = {
   addInteractions() {
     FeatureMixin.addInteractions.call(this)
     this.on('dragend', this._onDragEnd)
-    if (!this.feature.isReadOnly()) this.on('mouseover', this._enableDragging)
+    if (!this.feature.isReadOnly() && this.feature.getOption('draggable') !== false) {
+      this.on('mouseover', this._enableDragging)
+    }
     this.on('mouseout', this._onMouseOut)
   },
 
@@ -151,6 +153,7 @@ const PointMixin = {
 
   _enableDragging: function () {
     // TODO: start dragging after 1 second on mouse down
+    if (this.feature.getOption('draggable') === false) return
     if (this._map._umap.editEnabled) {
       if (!this.editEnabled()) this.enableEdit()
       // Enabling dragging on the marker override the Draggable._OnDown
@@ -436,9 +439,9 @@ export const LeafletPolyline = Polyline.extend({
         offset: this.feature.getOption('textPathOffset') || undefined,
         position: this.feature.getOption('textPathPosition'),
         attributes: {
-          fill: color,
-          opacity: this.feature.getDynamicOption('opacity'),
-          rotate: this.feature.getOption('textPathRotate'),
+          'fill': color,
+          'opacity': this.feature.getDynamicOption('opacity'),
+          'rotate': this.feature.getOption('textPathRotate'),
           'font-size': this.feature.getOption('textPathSize'),
         },
       }

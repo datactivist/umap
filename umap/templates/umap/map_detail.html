@@ -75,7 +75,7 @@
               Pour importer un fichier csv, le fichier d'origine doit respecter les paramètres suivants :
               <ul>
                 <li>- Virgule, tabulation ou point-virgule pour séparer des valeurs.</li>
-                <li>- SRS WGS84 est implicite.</li>
+                <li>- Le système de coordonnées <a href="https://epsg.io/4326" target="_blank" rel="noopener">SRS WGS84</a> est implicite.</li>
                 <li>- Seuls les points géométriques sont importés. L'importation se référera au titre dans les entêtes de colonnes de «lat» et «lon» au début de l'en-tête, et est insensible à la casse. Toutes les autres colonnes sont importées en tant que propriétés.</li>
               </ul>
               </br>
@@ -113,6 +113,10 @@
               selector: '.umap-import input[type="url"]',
               title: "Importer des données distantes",
               text: `Vous pouvez aussi coller l'URL de données distantes
+              </br></br>
+              Les formats de données possibles sont les mêmes que pour l’import local : <b>geojson, csv, gpx, kml, osm, georss, umap</b>.
+              </br></br>
+              Les fichiers csv doivent  respecter les mêmes paramètres que pour l’import de fichiers locaux.
               </br>
               <i>Appuyer sur suivant pour continuer</i>`,
               showPrev: false,
@@ -353,13 +357,11 @@
               title: "Les couches de données",
               text: `Les couches de données (ou calques) permettent d'organiser les objets géographiques de manière thématique. Chaque couche peut avoir ses propres propriétés d'affichage et de style.
               </br></br>
-              <b>Avantages des couches :</b>
-              </br></br>
               <table style="width: 100%; border-collapse: collapse; margin: 10px 0;">
                 <thead>
                   <tr style="background-color: #f0f0f0;">
                     <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Avantage</th>
-                    <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Description</th>
+                    <th style="border: 1px solid #ddd; padding: 8px; text-align: left;"></th>
                   </tr>
                 </thead>
                 <tbody>

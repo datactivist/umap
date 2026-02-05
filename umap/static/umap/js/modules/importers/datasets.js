@@ -27,7 +27,8 @@ export class Importer {
     this.choices = options?.choices
     this.id = this.name.toLowerCase().replace(/\s+/g, '-')
     this.searchUrl =
-      options?.searchUrl || 'https://photon.komoot.io/api?q={q}&layer=county&layer=city&layer=state'
+      options?.searchUrl ||
+      'https://photon.komoot.io/api?q={q}&layer=county&layer=city&layer=state'
   }
 
   async open(importer) {
@@ -36,16 +37,28 @@ export class Importer {
 
     // --- Dataset selector ---
     const select = DomUtil.create('select', '', container)
-    DomUtil.element({ tagName: 'option', parent: select, value: '', textContent: translate('Choose a dataset') })
+    DomUtil.element({
+      tagName: 'option',
+      parent: select,
+      value: '',
+      textContent: translate('Choose a dataset'),
+    })
     for (const dataset of this.choices) {
       const option = DomUtil.create('option', '', select)
-      option.value = dataset.url || (dataset.format === 'osm' ? (this.map?.properties?.importers?.overpass?.url || 'https://overpass-api.de/api/interpreter') : '')
+      option.value =
+        dataset.url ||
+        (dataset.format === 'osm'
+          ? this.map?.properties?.importers?.overpass?.url ||
+            'https://overpass-api.de/api/interpreter'
+          : '')
       option.textContent = dataset.label
       option.dataset.format = dataset.format || 'geojson'
       // store the dataset data key (slug) so we can call the API using the data identifier
       if (dataset.data) option.dataset.data = dataset.data
-      if (dataset.geographic_query) option.dataset.geographic_query = dataset.geographic_query
-      else if (dataset.geographicQuery) option.dataset.geographic_query = dataset.geographicQuery
+      if (dataset.geographic_query)
+        option.dataset.geographic_query = dataset.geographic_query
+      else if (dataset.geographicQuery)
+        option.dataset.geographic_query = dataset.geographicQuery
       if (dataset.expression) option.dataset.expression = dataset.expression
       // Store source and description if provided
       if (dataset.source) option.dataset.source = dataset.source
@@ -53,21 +66,45 @@ export class Importer {
     }
 
     // --- Source and Description info boxes ---
-    const sourceLabel = DomUtil.element({ tagName: 'div', parent: container, className: 'dataset-info' })
+    const sourceLabel = DomUtil.element({
+      tagName: 'div',
+      parent: container,
+      className: 'dataset-info',
+    })
     sourceLabel.style.display = 'none'
     sourceLabel.style.marginTop = '10px'
-    const sourceTitle = DomUtil.element({ tagName: 'strong', textContent: 'Source : ', parent: sourceLabel })
-    const sourceLink = DomUtil.element({ tagName: 'a', parent: sourceLabel, target: '_blank' })
-    
-    const descLabel = DomUtil.element({ tagName: 'div', parent: container, className: 'dataset-info' })
+    const sourceTitle = DomUtil.element({
+      tagName: 'strong',
+      textContent: 'Source : ',
+      parent: sourceLabel,
+    })
+    const sourceLink = DomUtil.element({
+      tagName: 'a',
+      parent: sourceLabel,
+      target: '_blank',
+    })
+
+    const descLabel = DomUtil.element({
+      tagName: 'div',
+      parent: container,
+      className: 'dataset-info',
+    })
     descLabel.style.display = 'none'
     descLabel.style.marginTop = '10px'
-    const descTitle = DomUtil.element({ tagName: 'strong', textContent: 'Description : ', parent: descLabel })
+    const descTitle = DomUtil.element({
+      tagName: 'strong',
+      textContent: 'Description : ',
+      parent: descLabel,
+    })
     const descText = DomUtil.element({ tagName: 'span', parent: descLabel })
 
     // --- Area autocomplete (for OSM) ---
     const label = DomUtil.element({ tagName: 'label', id: 'area', parent: container })
-    DomUtil.element({ tagName: 'span', textContent: translate('Search area'), parent: label })
+    DomUtil.element({
+      tagName: 'span',
+      textContent: translate('Search area'),
+      parent: label,
+    })
     this.autocomplete = new Autocomplete(label, {
       url: this.searchUrl,
       placeholder: translate('Type area name (optional)'),
@@ -80,20 +117,58 @@ export class Importer {
     const overpassContainer = DomUtil.create('div', 'overpass-form', container)
     overpassContainer.style.display = 'none'
     const exprLabel = DomUtil.element({ tagName: 'label', parent: overpassContainer })
-    DomUtil.element({ tagName: 'span', textContent: translate('Expression'), parent: exprLabel })
-    const tagsInput = DomUtil.element({ tagName: 'input', parent: exprLabel, type: 'text', name: 'tags', placeholder: 'amenity=drinking_water', readOnly: true })
+    DomUtil.element({
+      tagName: 'span',
+      textContent: translate('Expression'),
+      parent: exprLabel,
+    })
+    const tagsInput = DomUtil.element({
+      tagName: 'input',
+      parent: exprLabel,
+      type: 'text',
+      name: 'tags',
+      placeholder: 'amenity=drinking_water',
+      readOnly: true,
+    })
     tagsInput.style.display = 'block'
     tagsInput.style.width = '100%'
     const geomLabel = DomUtil.element({ tagName: 'label', parent: overpassContainer })
-    DomUtil.element({ tagName: 'span', textContent: translate('Geometry mode'), parent: geomLabel })
-    const outSelect = DomUtil.element({ tagName: 'select', parent: geomLabel, name: 'out' })
-    DomUtil.element({ tagName: 'option', parent: outSelect, value: 'geom', textContent: translate('Default'), selected: true })
-    DomUtil.element({ tagName: 'option', parent: outSelect, value: 'center', textContent: translate('Only geometry centers') })
+    DomUtil.element({
+      tagName: 'span',
+      textContent: translate('Geometry mode'),
+      parent: geomLabel,
+    })
+    const outSelect = DomUtil.element({
+      tagName: 'select',
+      parent: geomLabel,
+      name: 'out',
+    })
+    DomUtil.element({
+      tagName: 'option',
+      parent: outSelect,
+      value: 'geom',
+      textContent: translate('Default'),
+      selected: true,
+    })
+    DomUtil.element({
+      tagName: 'option',
+      parent: outSelect,
+      value: 'center',
+      textContent: translate('Only geometry centers'),
+    })
 
     // --- umap-data filter selector ---
-    const geoSelectLabel = DomUtil.element({ tagName: 'label', id: 'geo_select_label', parent: container })
+    const geoSelectLabel = DomUtil.element({
+      tagName: 'label',
+      id: 'geo_select_label',
+      parent: container,
+    })
     DomUtil.element({ tagName: 'br', parent: geoSelectLabel })
-    DomUtil.element({ tagName: 'span', textContent: 'Sélectionne la zone géographique', parent: geoSelectLabel })
+    DomUtil.element({
+      tagName: 'span',
+      textContent: 'Sélectionne la zone géographique',
+      parent: geoSelectLabel,
+    })
     const geoSelect = DomUtil.create('select', '', geoSelectLabel)
     geoSelectLabel.style.display = 'none'
 
@@ -133,12 +208,22 @@ export class Importer {
       if (fmt === 'umap-data') {
         geoSelectLabel.style.display = ''
         geoSelect.innerHTML = ''
-        DomUtil.element({ tagName: 'option', parent: geoSelect, value: '', textContent: translate('Choose a filter') })
+        DomUtil.element({
+          tagName: 'option',
+          parent: geoSelect,
+          value: '',
+          textContent: translate('Choose a filter'),
+        })
         try {
           const base = this.map?.properties?.UMAP_DATA_API || ''
-    // Prefer a dataset 'data' key (slug) when present; fall back to slugified label
-    const labelSlug = option && option.dataset && option.dataset.data ? option.dataset.data : (option ? option.textContent.toLowerCase().replace(/\s+/g, '-') : '')
-    const url = `${base}datasets/${labelSlug}/filters`
+          // Prefer a dataset 'data' key (slug) when present; fall back to slugified label
+          const labelSlug =
+            option && option.dataset && option.dataset.data
+              ? option.dataset.data
+              : option
+                ? option.textContent.toLowerCase().replace(/\s+/g, '-')
+                : ''
+          const url = `${base}datasets/${labelSlug}/filters`
           const resp = await fetch(url)
           if (!resp.ok) throw new Error(`HTTP ${resp.status}`)
           let data = await resp.json()
@@ -175,7 +260,9 @@ export class Importer {
         } catch (err) {
           geoSelectLabel.style.display = 'none'
           console.error('Failed to load umap-data filters', err)
-          Alert && Alert.error && Alert.error(translate('Failed to load filters from remote API'))
+          Alert &&
+            Alert.error &&
+            Alert.error(translate('Failed to load filters from remote API'))
         }
         return
       }
@@ -186,6 +273,9 @@ export class Importer {
       const option = select.options[select.selectedIndex]
       const fmt = option && option.dataset ? option.dataset.format : null
       if (!select.value && fmt !== 'umap-data') return
+
+      importer.layerOptions = { draggable: false }
+      importer.featureOptions = { draggable: false }
 
       importer.layerName = option ? option.textContent : ''
 
@@ -207,43 +297,65 @@ export class Importer {
           body = body.replace(/;?\s*out\s+[^;]+;?\s*$/i, '')
           if (body.startsWith('(')) {
             const bbox = '{south},{west},{north},{east}'
-            body = body.replace(/\b(nwr|node|way|relation)(\[[^\]]*\])?/ig, function (match, el, attrs) {
-              return el + (attrs || '') + `(${bbox})`
-            })
+            body = body.replace(
+              /\b(nwr|node|way|relation)(\[[^\]]*\])?/gi,
+              function (match, el, attrs) {
+                return el + (attrs || '') + `(${bbox})`
+              }
+            )
           } else if (/^\s*(?:nwr|node|way|relation)/i.test(body)) {
-            const areaStr = this.boundaryChoice ? `area:${this.boundaryChoice.item.value}` : '{south},{west},{north},{east}'
-            body = body.replace(/;?$/,'') + `(${areaStr})`
+            const areaStr = this.boundaryChoice
+              ? `area:${this.boundaryChoice.item.value}`
+              : '{south},{west},{north},{east}'
+            body = body.replace(/;?$/, '') + `(${areaStr})`
           }
           const query = `[out:json];${body};out ${outSelect.value};`
           importer.url = `${select.value}?data=${encodeURIComponent(query)}`
           importer.format = 'osm'
-          if (this.boundaryChoice) importer.layerName = `${(option ? option.textContent : '')} - ${this.boundaryChoice.item.label}`
+          if (this.boundaryChoice)
+            importer.layerName = `${option ? option.textContent : ''} - ${this.boundaryChoice.item.label}`
         } else {
           const params = { expression: expr, out: outSelect.value, autoConfirm: true }
           if (this.boundaryChoice) params.area = this.boundaryChoice.item.value
-          if (typeof importer.openHelper === 'function') importer.openHelper('overpass', params)
+          if (typeof importer.openHelper === 'function')
+            importer.openHelper('overpass', params)
           else {
-            const area = this.boundaryChoice ? `area:${this.boundaryChoice.item.value}` : '{south},{west},{north},{east}'
+            const area = this.boundaryChoice
+              ? `area:${this.boundaryChoice.item.value}`
+              : '{south},{west},{north},{east}'
             const tags = expr.startsWith('[') ? expr : `[${expr}]`
             const query = `[out:json];nwr${tags}(${area});out ${outSelect.value};`
             importer.url = `${select.value}?data=${encodeURIComponent(query)}`
             importer.format = 'osm'
-            if (this.boundaryChoice) importer.layerName = `${(option ? option.textContent : '')} - ${this.boundaryChoice.item.label}`
+            if (this.boundaryChoice)
+              importer.layerName = `${option ? option.textContent : ''} - ${this.boundaryChoice.item.label}`
           }
         }
       } else if (fmt === 'umap-data') {
         const base = this.map?.properties?.UMAP_DATA_API || ''
-  const labelSlug = option && option.dataset && option.dataset.data ? option.dataset.data : (option ? option.textContent.toLowerCase().replace(/\s+/g, '-') : '')
-  const geographicQuery = option && option.dataset ? (option.dataset.geographic_query || option.dataset.geographicQuery) : 'geographic_query'
+        const labelSlug =
+          option && option.dataset && option.dataset.data
+            ? option.dataset.data
+            : option
+              ? option.textContent.toLowerCase().replace(/\s+/g, '-')
+              : ''
+        const geographicQuery =
+          option && option.dataset
+            ? option.dataset.geographic_query || option.dataset.geographicQuery
+            : 'geographic_query'
         const selectedFilter = geoSelect && geoSelect.value ? geoSelect.value : ''
         if (!selectedFilter) {
-          Alert && Alert.error && Alert.error(translate('Please select a geographic filter'))
+          Alert &&
+            Alert.error &&
+            Alert.error(translate('Please select a geographic filter'))
           return
         }
         const url = `${base}datasets/${labelSlug}?${encodeURIComponent(geographicQuery)}=${encodeURIComponent(selectedFilter)}`
         importer.url = url
         importer.format = 'geojson'
-        importer.layerName = (option ? option.textContent : '') + (selectedFilter ? ` - ${selectedFilter}` : '')
+        importer.layerName =
+          (option ? option.textContent : '') +
+          (selectedFilter ? ` - ${selectedFilter}` : '')
       } else {
         importer.url = select.value
         importer.format = fmt
@@ -252,7 +364,12 @@ export class Importer {
     }
 
     importer.dialog
-      .open({ template: container, className: `${this.id} importer dark`, accept: translate('Choose this dataset'), cancel: false })
+      .open({
+        template: container,
+        className: `${this.id} importer dark`,
+        accept: translate('Choose this dataset'),
+        cancel: false,
+      })
       .then(confirm)
   }
 }

@@ -63,6 +63,9 @@ export default class Importer extends Utils.WithTemplate {
     this._umap = umap
     this.TYPES = ['geojson', 'csv', 'gpx', 'kml', 'osm', 'georss', 'umap']
     this.IMPORTERS = []
+    this.layerOptions = null
+    this.featureOptions = null
+    this._pendingFeatureOptions = null
     this.loadImporters()
     this.dialog = new Dialog({
       className: 'importers dark',
@@ -180,15 +183,22 @@ export default class Importer extends Utils.WithTemplate {
     return (
       this._layer ||
       this._umap.datalayers[this.layerId] ||
-      this._umap.createDirtyDataLayer({ name: this.layerName })
+      this._umap.createDirtyDataLayer(this._buildLayerOptions())
     )
+  }
+
+  _buildLayerOptions() {
+    const options = { ...(this.layerOptions || {}) }
+    if (this.layerName) options.name = this.layerName
+    return options
   }
 
   showImporters() {
     if (!this.IMPORTERS.length) return
     const [element, { grid }] = Utils.loadTemplateWithRefs(GRID_TEMPLATE)
     for (const plugin of this.IMPORTERS.sort((a, b) => (a.name > b.name ? 1 : -1))) {
-      const label = plugin.name === 'Overpass' ? translate('Interroger OSM') : plugin.name
+      const label =
+        plugin.name === 'Overpass' ? translate('Interroger OSM') : plugin.name
       const button = Utils.loadTemplate(
         `<li><button type="button" class="${plugin.id}">${label}</button></li>`
       )
@@ -260,9 +270,16 @@ export default class Importer extends Utils.WithTemplate {
   onFileChange() {
     let type = ''
     let newType
-    console.log('Importer.onFileChange: files selected', this.files && this.files.length)
+    console.log(
+      'Importer.onFileChange: files selected',
+      this.files && this.files.length
+    )
     for (const file of this.files) {
-      console.log(' Importer.onFileChange: file', { name: file.name, size: file.size, type: file.type })
+      console.log(' Importer.onFileChange: file', {
+        name: file.name,
+        size: file.size,
+        type: file.type,
+      })
       newType = Utils.detectFileType(file)
       if (!type && newType) type = newType
       if (type && newType !== type) {
@@ -279,6 +296,9 @@ export default class Importer extends Utils.WithTemplate {
     this.format = undefined
     this.layerName = null
     this.raw = null
+    this.layerOptions = null
+    this.featureOptions = null
+    this._pendingFeatureOptions = null
     const layerSelect = this.qs('[name="layer-id"]')
     layerSelect.innerHTML = ''
     this._umap.datalayers.reverse().map((datalayer) => {
@@ -340,7 +360,11 @@ export default class Importer extends Utils.WithTemplate {
       if (this.files.length) {
         console.log('Importer.full: processing files count', this.files.length)
         for (const file of this.files) {
-          console.log(' Importer.full: file', { name: file.name, size: file.size, type: file.type })
+          console.log(' Importer.full: file', {
+            name: file.name,
+            size: file.size,
+            type: file.type,
+          })
           this._umap.processFileToImport(file, null, 'umap')
         }
       } else if (this.raw) {
@@ -365,6 +389,9 @@ export default class Importer extends Utils.WithTemplate {
       return false
     }
     const layer = this.layer
+    this.layerOptions = null
+    this.featureOptions = null
+    this._pendingFeatureOptions = null
     layer.properties.remoteData = {
       url: this.url,
       format: this.format,
@@ -392,10 +419,21 @@ export default class Importer extends Utils.WithTemplate {
     }
     let promise
     const layer = this.layer
+    this.layerOptions = null
+    this._pendingFeatureOptions = this.featureOptions
+    this.featureOptions = null
     if (this.clear) layer.empty()
     if (this.files.length) {
-      console.log('Importer.copy: calling importFromFiles with files:', this.files.length)
-      for (const f of this.files) console.log(' Importer.copy file:', { name: f.name, size: f.size, type: f.type })
+      console.log(
+        'Importer.copy: calling importFromFiles with files:',
+        this.files.length
+      )
+      for (const f of this.files)
+        console.log(' Importer.copy file:', {
+          name: f.name,
+          size: f.size,
+          type: f.type,
+        })
       promise = layer.importFromFiles(this.files, this.format)
     } else if (this.raw) {
       promise = layer.importRaw(this.raw, this.format)
@@ -428,6 +466,21 @@ export default class Importer extends Utils.WithTemplate {
       this.onError()
       return
     }
+
+    if (this._pendingFeatureOptions) {
+      for (const feature of features) {
+        if (!feature?.properties) continue
+        feature.properties._umap_options = feature.properties._umap_options || {}
+        Object.assign(feature.properties._umap_options, this._pendingFeatureOptions)
+        if (
+          this._pendingFeatureOptions.draggable === false &&
+          feature.ui?.disableEdit
+        ) {
+          feature.ui.disableEdit()
+        }
+      }
+    }
+    this._pendingFeatureOptions = null
 
     const bounds = new LatLngBounds()
     let validCount = 0

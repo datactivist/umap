@@ -1,59 +1,143 @@
-# Outil de visualisation - Rafraîchissement des villes
+# -*- coding:utf-8 -*-
 
-Cet outil est une extension d'uMap, un logiciel open source permettant de créer des cartes personnalisées à partir de données géographiques.
+"""
+Example settings for local development
 
-- Le site officiel d'uMap : [umap-project.org](https://umap-project.org)
-- La documentation technique : [docs.umap-project.org](https://docs.umap-project.org/en/stable/)
-- Vous pouvez également les suivre via [Matrix](https://matrix.to/#/#umap:matrix.org), le [forum](https://forum.openstreetmap.fr/c/utiliser/umap/29) ou la [liste de diffusion](https://lists.openstreetmap.org/listinfo/umap)
+Use this file as a base for your local development settings and copy
+it to umap/settings/local.py. It should not be checked into
+your code repository.
 
-Cette version d'uMap intègre un outil de visualisation et de rafraîchissement des données des villes à partir de sources externes.
-Une API permettant de fournir les données relatives à notre cas d'usage a également été développée et est disponible ici : [Documentation API](https://github.com/datactivist/umap-data-api).
+"""
 
-## Installation
+from umap.settings.base import *  # pylint: disable=W0614,W0401
 
-Veuillez suivre les instructions d'installation standard d'uMap disponibles dans la [documentation officielle](https://docs.umap-project.org/en/stable/install/).
+SECRET_KEY = "!!change me!!"
+INTERNAL_IPS = ("127.0.0.1",)
+ALLOWED_HOSTS = [
+    "*",
+]
 
-## Configuration
+# Simple password protection (temporary)
+# Set to None to disable password protection
+SIMPLE_PASSWORD_PROTECTION = "odv"
 
-### Protection par mot de passe (temporaire)
+DEBUG = True
 
-Une protection par mot de passe simple a été ajoutée pour contrôler l'accès à l'application. Cette fonctionnalité peut être activée en ajoutant la configuration suivante dans `local_settings.py` :
+ADMINS = (("You", "your@email"),)
+MANAGERS = ADMINS
 
-```python
-# Protection par mot de passe simple (temporaire)
-# Définir à None pour désactiver la protection
-SIMPLE_PASSWORD_PROTECTION = "umap2025"
-```
+DATABASES = {
+    "default": {
+        "ENGINE": "django.contrib.gis.db.backends.postgis",
+        "NAME": "umap",
+        "USER": "umap",
+    }
+}
 
-Lorsque cette fonctionnalité est activée :
+LANGUAGE_CODE = "en"
 
-- Tous les utilisateurs doivent entrer le mot de passe pour accéder à l'application
-- L'authentification est stockée dans la session Django
-- Les fichiers statiques et la page de connexion sont exemptés de la protection
+# Set to False if login into django account should not be possible. You can
+# administer accounts in the admin interface.
+ENABLE_ACCOUNT_LOGIN = True
 
-Pour désactiver la protection, définissez `SIMPLE_PASSWORD_PROTECTION = None` ou supprimez complètement le paramètre.
+"""LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "level": "DEBUG",
+            "class": "logging.StreamHandler",
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": "DEBUG",
+        },
+    },
+}
+"""
 
-**Note :** Il s'agit d'une solution temporaire utilisant un mot de passe partagé unique. Pour un environnement de production avec des données sensibles, utilisez un système d'authentification approprié.
+AUTHENTICATION_BACKENDS = (
+    "social_core.backends.github.GithubOAuth2",
+    # "social_core.backends.bitbucket.BitbucketOAuth",
+    # "social_core.backends.twitter.TwitterOAuth",
+    "social_core.backends.openstreetmap_oauth2.OpenStreetMapOAuth2",
+    "django.contrib.auth.backends.ModelBackend",
+)
+SOCIAL_AUTH_GITHUB_KEY = "GITHUB_KEY"
+SOCIAL_AUTH_GITHUB_SECRET = "GITHUB_SECRET"
+SOCIAL_AUTH_BITBUCKET_KEY = "xxx"
+SOCIAL_AUTH_BITBUCKET_SECRET = "xxx"
+# We need email to associate with other Oauth providers
+SOCIAL_AUTH_GITHUB_SCOPE = [
+    "user:email",
+]
+SOCIAL_AUTH_TWITTER_KEY = "xxx"
+SOCIAL_AUTH_TWITTER_SECRET = "xxx"
+SOCIAL_AUTH_OPENSTREETMAP_OAUTH2_KEY = "OSM_KEY"
+SOCIAL_AUTH_OPENSTREETMAP_OAUTH2_SECRET = "OSM_SECRET"
+MIDDLEWARE += ("social_django.middleware.SocialAuthExceptionMiddleware",)
+SOCIAL_AUTH_REDIRECT_IS_HTTPS = False
+SOCIAL_AUTH_RAISE_EXCEPTIONS = False
+SOCIAL_AUTH_BACKEND_ERROR_URL = "/"
 
-### Sources de données pour l'import
+# If you want to add a playgroud map, add its primary key
+# UMAP_DEMO_PK = 204
+# If you want to add a showcase map on the home page, add its primary key
+# UMAP_SHOWCASE_PK = 1156
+# Add a baner to warn people this instance is not production ready.
+UMAP_DEMO_SITE = True
 
-Les sources de données utilisées dans l'assistant d'import peuvent être définies dans le fichier de configuration `local_settings.py` d'uMap.
-Dans la variable UMAP_IMPORTERS, il est possible d'ajouter des datasets provenant de l'API de données comme cela :
+# Whether to allow non authenticated people to create maps.
+UMAP_ALLOW_ANONYMOUS = True
 
-```python
-{
-    "label": "Arbres (namR)",
-    "data": "arbres", # Nom de la clé dans l'API
-    "geographic_query": "commune", # Geographic filter in the API
-    "format": "umap-data",
-    "source": "https://www.data.gouv.fr/datasets/arbres-en-open-data-en-france-par-namr/",
-    "description": "Ce jeu de données concerne l’ensemble des arbres urbains référencés dans l’open data.",
-},
-```
+# This setting will exclude empty maps (in fact, it will exclude all maps where
+# the default center has not been updated)
+UMAP_EXCLUDE_DEFAULT_MAPS = False
 
-Voici un exemple de configuration qui utilise entre autres l'API Overpass pour OpenStreetMap ainsi qu'une API développée pour notre cas d'usage :
+# How many maps should be showcased on the main page resp. on the user page
+UMAP_MAPS_PER_PAGE = 5
+# How many maps should be looked for when performing a (sub)search
+UMAP_MAPS_PER_SEARCH = 15
+# How many maps should be showcased on the user page, if owner
+UMAP_MAPS_PER_PAGE_OWNER = 10
 
-```python
+SITE_URL = "http://localhost:8000"
+SHORT_SITE_URL = "http://s.hort"
+
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+#         'LOCATION': '/var/tmp/django_cache',
+#     }
+# }
+
+# POSTGIS_VERSION = (2, 1, 0)
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+# Put the site in readonly mode (useful for migration or any maintenance)
+UMAP_READONLY = False
+
+
+# For static deployment
+STATIC_ROOT = "/srv/umap/var/static"
+
+# For users' statics (geojson mainly)
+MEDIA_ROOT = "/srv/umap/var/data"
+
+# Default map location for new maps
+LEAFLET_LONGITUDE = 2.2137
+LEAFLET_LATITUDE = 47.7640
+LEAFLET_ZOOM = 7
+UMAP_FOCUS_COUNTRY = "FR"
+
+# Number of old version to keep per datalayer.
+UMAP_KEEP_VERSIONS = 10
+
+# UMAP_DATA_API = "https://api.umap.datactivist.coop/api/v1/"
+UMAP_DATA_API = "http://localhost:8001/api/v1/"
+
 UMAP_IMPORTERS = {
     "overpass": {"url": "https://overpass-api.de/api/interpreter"},
     "communesfr": {"name": "Communes françaises"},
@@ -308,6 +392,3 @@ UMAP_IMPORTERS = {
         ],
     },
 }
-```
-
-Un exemple de configuration, qui a été utilisé dans le cadre du projet est disponible dans le fichier `local_settings_example.py` à la racine du dépôt. Dans le cadre d'un déploiement il conviendra de changer les clés d'API et les secrets pour les services d'authentification (Github, OSM), la variable `SITE_URL` en fonction de l'URL d'accès à l'application, ainsi que le mot de passe de protection simple.

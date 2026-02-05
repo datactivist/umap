@@ -6,11 +6,11 @@
   {# We don't want maps in the list to display errors. #}
 {% endblock messages %}
 {% block maincontent %}
-  <button id="start-tutorial-btn" class="fr-btn fr-btn--tertiary">{% trans 'Start tutorial' %}</button>
+  <!-- <button id="start-tutorial-btn" class="fr-btn fr-btn--tertiary">{% trans 'Start tutorial' %}</button>
   <div class="mt-2">
     <button id="simplified-toggle" class="fr-btn fr-btn--secondary" data-default="{{ SIMPLIFIED_MODE|yesno:'true,false' }}" aria-pressed="false">{% trans 'Simplified' %}</button>
     <span id="simplified-status">{% if SIMPLIFIED_MODE %}{{ 'Simplified mode is ON' }}{% else %}{{ 'Simplified mode is OFF' }}{% endif %}</span>
-  </div>
+  </div>-->
   {% include "umap/search_bar.html" %}
   {% include "umap/about_summary.html" %}
   {% if showcase_map %}
@@ -90,8 +90,16 @@
       const steps = [
               { 
                 selector: '', 
-                title: 'Recommandation', 
+                title: 'Tutoriel : Connexion et création de carte', 
                 text: `
+                Bienvenue sur l'outil de visualisation et de création de cartes lié à la thématique du rafraîchissement des villes.
+                </br></br>
+
+                Dans ce tutoriel, vous allez découvrir comment vous connecter et créer une carte.
+                </br>
+                Ce tutoriel est également accessible à tout moment au format PDF via le bouton "Tutoriel" dans la barre de navigation principale, ou en cliquant sur ce <a href="https://umap.datactivist.coop/media/doc/umap_tutorial_fr.pdf" target="_blank" rel="noopener">lien direct</a>.
+                </br></br>
+
                 <b>Recommandation :</b> Bien qu'il soit possible de créer une carte sans compte, il est fortement conseillé de s'identifier pour pouvoir retrouver, modifier et gérer ses cartes facilement.
                 </br></br>
                 <table style="width: 100%; border-collapse: collapse; margin: 10px 0;">
@@ -105,8 +113,8 @@
                   <tbody>
                     <tr>
                       <td style="border: 1px solid #ddd; padding: 8px;">Création d'une carte</td>
-                      <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">✅</td>
-                      <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">✅</td>
+                      <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">✅ Possible</td>
+                      <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">✅ Possible</td>
                     </tr>
                     <tr style="background-color: #f9f9f9;">
                       <td style="border: 1px solid #ddd; padding: 8px;">Sauvegarde de la carte</td>
@@ -115,8 +123,8 @@
                     </tr>
                     <tr>
                       <td style="border: 1px solid #ddd; padding: 8px;">Création d'équipes</td>
-                      <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">❌</td>
-                      <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">✅</td>
+                      <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">❌ Impossible</td>
+                      <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">✅ Possible</td>
                     </tr>
                     <tr style="background-color: #f9f9f9;">
                       <td style="border: 1px solid #ddd; padding: 8px;">Attribution des droits d'édition</td>
@@ -152,7 +160,11 @@
                 text: `
                 <b>Il est possible de rechercher et de consulter les cartes créées par la communauté.</b>
                 </br></br>
-                Les cartes explicitement configurées comme "visibles par tous" par le créateur sont accessibles dans cet espace. Un utilisateur non connecté peut également y rendre sa carte publique.
+                Les cartes explicitement configurées comme "visibles par tous" par le créateur sont accessibles dans cet espace. 
+                <br><br>
+                Au contraire, si elles ne sont pas explicitement configurées comme telles, l’accès aux cartes sera restreint au seul créateur ou aux équipes pour lesquels un accès explicite a été paramétré. Elles ne seront pas accessibles ici, mais dans votre espace personnel accessible depuis la barre de navigation. 
+                <br><br>
+                Un utilisateur non connecté peut également rendre sa carte publique.
                 </br></br>
                 <i>Pour continuer, cliquez sur "Suivant"</i>`,
                 showPrev: false,
@@ -172,22 +184,36 @@
               },
       ]
 
+
       const tutorialKey = 'umapTutorialActive'
       const endedPrefix = 'umapTutorialEnded_'
+      const lastSeenKey = 'umapTutorialLastSeen_home'
       let tour = null
 
-      const isActive = (() => {
-        try { return localStorage.getItem(tutorialKey) === '1' } catch (err) { return false }
-      })()
+      // Helper: check if 24h have passed since last tutorial completion
+      function shouldStartTutorial() {
+        try {
+          const lastSeen = localStorage.getItem(lastSeenKey)
+          if (!lastSeen) return true
+          const last = parseInt(lastSeen, 10)
+          if (isNaN(last)) return true
+          const now = Date.now()
+          // 24 hours = 86400000 ms
+          return (now - last) > 86400000
+        } catch (err) {
+          return true
+        }
+      }
 
-      // Only auto-start the home tutorial if global active flag is set and
-      // the per-tour ended flag for 'home' is NOT set.
-      const isHomeEnded = (() => {
-        try { return localStorage.getItem(endedPrefix + 'home') === '1' } catch (err) { return false }
-      })()
-
-      if (isActive && !isHomeEnded) {
+      // Always auto-start tutorial on arrival, unless completed in last 24h
+      if (shouldStartTutorial()) {
         tour = new Tutorial(steps, 'home')
+        // Patch: when tutorial ends, set lastSeenKey to now
+        const origEnd = tour.end.bind(tour)
+        tour.end = function() {
+          try { localStorage.setItem(lastSeenKey, Date.now().toString()) } catch (err) {}
+          origEnd()
+        }
         tour.start()
       }
 
@@ -202,13 +228,19 @@
               const key = localStorage.key(i)
               if (key && key.indexOf(endedPrefix) === 0) {
                 localStorage.removeItem(key)
-                // since we mutated localStorage, adjust index
                 i--
               }
             }
             localStorage.setItem(tutorialKey, '1')
+            localStorage.removeItem(lastSeenKey)
           } catch (err) { console.log('[Tutorial] failed to reset flags', err) }
           if (!tour) tour = new Tutorial(steps, 'home')
+          // Patch: when tutorial ends, set lastSeenKey to now
+          const origEnd = tour.end.bind(tour)
+          tour.end = function() {
+            try { localStorage.setItem(lastSeenKey, Date.now().toString()) } catch (err) {}
+            origEnd()
+          }
           try { tour.start() } catch (err) { console.log('[Tutorial] failed to start', err) }
         })
       }

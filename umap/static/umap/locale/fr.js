@@ -91,7 +91,7 @@ const locale = {
     'Vue courante plutôt que la vue par défaut ?',
   'Custom background': 'Fond de carte personnalisé',
   'Custom overlay': 'Fond transparent',
-  'dash array': 'traitillé',
+  'dash array': 'Traitillé',
   'Data is browsable': 'Données naviguables',
   'Datalayers': 'Calques',
   'Default interaction options': "Options d'interaction par défaut",
@@ -168,9 +168,9 @@ const locale = {
   'Feature properties': "Propriétés de l'élément",
   'Fetch data each time map view changes.':
     'Récupère les données à chaque fois que la vue de la carte change.',
-  'fill color': 'couleur de remplissage',
-  'fill opacity': 'opacité du remplissage',
-  'fill': 'remplissage',
+  'fill color': 'Couleur de remplissage',
+  'fill opacity': 'Opacité du remplissage',
+  'fill': 'Remplissage',
   'Fit all data': 'Zoom sur les données',
   'Format': 'Format',
   'From zoom': 'À partir du zoom',
@@ -280,7 +280,7 @@ const locale = {
   'On the right': 'Droite',
   'On the top': 'Haut',
   "Only visible layers' data": 'Seules les données des calques visibles',
-  'opacity': 'opacité',
+  'opacity': 'Opacité',
   'Opacity': 'Transparence',
   'Open current feature on load': "Ouvrir l'élément courant au chargement",
   'Open link in…': 'Ouvrir le lien dans…',
@@ -402,7 +402,7 @@ const locale = {
   'View Fullscreen': 'Voir en plein écran',
   'View': 'Aperçu',
   'Visibility: {status}': 'Visibilité : {status}',
-  'weight': 'épaisseur',
+  'weight': 'Épaisseur',
   'Where do we go from here?': "C'est par où pour aller plus loin?",
   'Whether to display or not polygons paths.': 'Afficher les contours des polygones.',
   'Whether to fill polygons with color.': 'Remplir les polygones avec de la couleur.',
@@ -514,7 +514,7 @@ const locale = {
   'Expression': 'Expression',
   'Geometry mode': 'Type de géométries',
   'Only geometry centers': 'Seulement les centres',
-  'Search area': 'Chercher un coin',
+  'Search area': 'Filtrer par zone',
   'Type area name, or let empty to load data in current map view':
     "Entrer le nom d'un périmètre géographique, ou laisser vide pour utiliser la vue courante de la carte",
   'Data successfully imported!': 'Les données ont été importées!',
@@ -694,5 +694,5 @@ const locale = {
   'Right-click to edit': 'Clic droit pour éditer',
   'Draw along routes': 'Dessiner en suivant les routes',
 }
-L.registerLocale("fr", locale)
-L.setLocale("fr")
+L.registerLocale('fr', locale)
+L.setLocale('fr')
