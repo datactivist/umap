@@ -400,14 +400,24 @@ export default class Importer extends Utils.WithTemplate {
       layer.properties.remoteData.proxy = true
       layer.properties.remoteData.ttl = SCHEMA.ttl.default
     }
-    layer.fetchRemoteData(true).then((features) => {
-      if (features?.length) {
-        layer.zoomTo()
-        this.onSuccess()
-      } else {
-        this.onError()
-      }
-    })
+    layer
+      .fetchRemoteData(true)
+      .then((features) => {
+        if (features?.length) {
+          layer.zoomTo()
+          this.onSuccess()
+        } else {
+          this.onError()
+          // Remove the layer if import failed or returned no data
+          delete this._umap.datalayers[layer.id]
+          this._umap.onDataLayersChanged()
+        }
+      })
+      .catch((error) => {
+        // Remove the layer if import failed due to an error
+        delete this._umap.datalayers[layer.id]
+        this._umap.onDataLayersChanged()
+      })
   }
 
   async copy() {
@@ -464,6 +474,9 @@ export default class Importer extends Utils.WithTemplate {
     if (!features) return
     if (!features.length) {
       this.onError()
+      // Remove the layer if import returned no data
+      delete this._umap.datalayers[layer.id]
+      this._umap.onDataLayersChanged()
       return
     }
 
@@ -508,6 +521,9 @@ export default class Importer extends Utils.WithTemplate {
     if (validCount === 0) {
       // No usable features
       this.onError()
+      // Remove the layer if no valid features were found
+      delete this._umap.datalayers[layer.id]
+      this._umap.onDataLayersChanged()
       return
     }
     this.onSuccess(validCount)

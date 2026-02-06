@@ -4,11 +4,11 @@
   top: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0, 0, 0, 0.5);
   z-index: 99998;
 }
 .tutorial-highlight {
-  box-shadow: 0 0 0 4px rgba(255,200,0,0.9);
+  box-shadow: 0 0 0 4px rgba(255, 200, 0, 0.9);
   position: relative;
   z-index: 99999 !important;
 }
@@ -16,7 +16,7 @@
   background: #fff;
   padding: 12px;
   border-radius: 6px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 1);
   position: absolute; /* positioned by JS */
   z-index: 100000; /* above overlay/highlight */
   max-width: 720px;
@@ -51,10 +51,14 @@
   will-change: transform;
 }
 
+/* Keep autocomplete dropdown above highlighted importer dialog in tutorial */
+.tutorial-step-importer-specific-dialog .umap-autocomplete {
+  z-index: 100001;
+}
+
 /* Fix DSFR modal width */
 dialog.fr-modal,
 dialog#tutorial-choice-modal {
   max-width: 90vw !important;
   width: 100% !important;
 }
-

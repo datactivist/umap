@@ -5,7 +5,19 @@ import { BaseAjax, SingleMixin } from '../autocomplete.js'
 
 class Autocomplete extends SingleMixin(BaseAjax) {
   handleResults(data) {
-    return super.handleResults(data.features)
+    const features = Array.isArray(data.features) ? data.features : []
+    const filtered = features.filter((item) => {
+      const countryCode = item?.properties?.countrycode
+      const country = item?.properties?.country
+      if (countryCode && typeof countryCode === 'string') {
+        return countryCode.toLowerCase() === 'fr'
+      }
+      if (country && typeof country === 'string') {
+        return country.toLowerCase() === 'france'
+      }
+      return false
+    })
+    return super.handleResults(filtered)
   }
 
   createResult(item) {

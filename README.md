@@ -319,6 +319,14 @@ UMAP_IMPORTERS = {
 }
 ```
 
-Un exemple de configuration, qui a été utilisé dans le cadre du projet est disponible dans le fichier `local_settings_example.py` à la racine du dépôt. Dans le cadre d'un déploiement il conviendra de changer les clés d'API et les secrets pour les services d'authentification (Github, OSM), la variable `SITE_URL` en fonction de l'URL d'accès à l'application, ainsi que le mot de passe de protection simple.
+Un exemple de configuration, qui a été utilisé dans le cadre du projet est disponible dans le fichier `local_settings_example.py` à la racine du dépôt. Dans le cadre d'un déploiement il conviendra de changer à minima les clés d'API et les secrets pour les services d'authentification (ex : Github, OSM), les variable indiquant les URLs d'accès aux applications, ainsi que le mot de passe de protection simple :
+
+- `SOCIAL_AUTH_GITHUB_KEY`
+- `SOCIAL_AUTH_GITHUB_SECRET`
+- `SOCIAL_AUTH_OPENSTREETMAP_OAUTH2_KEY`
+- `SOCIAL_AUTH_OPENSTREETMAP_OAUTH2_SECRET`
+- `SITE_URL`
+- `UMAP_DATA_API`
+- `SIMPLE_PASSWORD_PROTECTION`
 
 De plus, il est possible d'ajouter des fonds de cartes et des licences personnalisées depuis les tables de la base Postgre créée suite à l'installation d'uMap. Pour cela, il suffit d'ajouter les entrées correspondantes dans les tables `umap_basemap` et `umap_license` de la base de données.

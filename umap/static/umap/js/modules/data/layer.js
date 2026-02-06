@@ -342,17 +342,19 @@ export class DataLayer {
 
   async getUrl(url, initialUrl) {
     const response = await this._umap.request.get(url)
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       if (response?.ok) {
         this._umap.modifiedAt = response.headers.get('last-modified')
         return resolve(response.text())
       }
+      const error = new Error('Failed to load remote data')
       Alert.error(
         translate('Cannot load remote data for layer "{layer}" with url "{url}"', {
           layer: this.getName(),
           url: initialUrl || url,
         })
       )
+      reject(error)
     })
   }
 
@@ -366,9 +368,10 @@ export class DataLayer {
     if (this.properties.remoteData.proxy) {
       url = this._umap.proxyUrl(url, this.properties.remoteData.ttl)
     }
-    return await this.getUrl(url, remoteUrl).then((raw) => {
+    try {
+      const raw = await this.getUrl(url, remoteUrl)
       this.clear(false)
-      return this._umap.formatter
+      const features = await this._umap.formatter
         .parse(raw, this.properties.remoteData.format)
         .then((geojson) => this.fromGeoJSON(geojson, false))
         .catch((error) => {
@@ -380,7 +383,18 @@ export class DataLayer {
             })
           )
         })
-    })
+      if (!this.createdOnServer && this.features.count() === 0) {
+        delete this._umap.datalayers[this.id]
+        this._umap.onDataLayersChanged()
+      }
+      return features
+    } catch (error) {
+      if (!this.createdOnServer && this.features.count() === 0) {
+        delete this._umap.datalayers[this.id]
+        this._umap.onDataLayersChanged()
+      }
+      throw error
+    }
   }
 
   isLoaded() {
@@ -644,7 +658,9 @@ export class DataLayer {
       .then((geojson) => {
         console.log('importRaw: parsed geojson', {
           type: geojson?.type,
-          features: Array.isArray(geojson?.features) ? geojson.features.length : undefined,
+          features: Array.isArray(geojson?.features)
+            ? geojson.features.length
+            : undefined,
         })
         // If importing many features into an existing datalayer, prefer Cluster
         // rendering to avoid creating thousands of individual markers.
@@ -652,8 +668,8 @@ export class DataLayer {
           const featureCount = Array.isArray(geojson?.features)
             ? geojson.features.length
             : Array.isArray(geojson)
-            ? geojson.length
-            : undefined
+              ? geojson.length
+              : undefined
           const CLUSTER_THRESHOLD = 1000
           if (featureCount > CLUSTER_THRESHOLD && !this.properties.type) {
             this.properties.type = 'Cluster'
@@ -667,7 +683,9 @@ export class DataLayer {
         this.sync.startBatch()
         const data = this.addData(geojson)
         this.sync.commitBatch()
-        console.log('importRaw: addData returned', { items: Array.isArray(data) ? data.length : typeof data })
+        console.log('importRaw: addData returned', {
+          items: Array.isArray(data) ? data.length : typeof data,
+        })
         return data
       })
       .catch((error) => {
@@ -679,14 +697,22 @@ export class DataLayer {
   readFile(f) {
     const MAX_INLINE_FILE = 50 * 1024 * 1024 // 50 MB
     return new Promise((resolve) => {
-      console.log('readFile: starting read', { name: f?.name, size: f?.size, type: f?.type })
+      console.log('readFile: starting read', {
+        name: f?.name,
+        size: f?.size,
+        type: f?.type,
+      })
       if (f?.size && f.size > MAX_INLINE_FILE) {
         // Browsers often fail or run out of memory when reading very large files
         // client-side. Give the user a clear message and avoid attempting the
         // read which may silently return an empty string.
-        console.warn('readFile: file too large for client-side import, aborting read', { size: f.size })
+        console.warn('readFile: file too large for client-side import, aborting read', {
+          size: f.size,
+        })
         Alert.error(
-          translate('File is too large to import in the browser. Please upload it to the server or split it into smaller files.'),
+          translate(
+            'File is too large to import in the browser. Please upload it to the server or split it into smaller files.'
+          ),
           10000
         )
         resolve('')
@@ -712,23 +738,32 @@ export class DataLayer {
     for (const file of files) {
       toLoad.push(this.importFromFile(file, type))
     }
-  console.log('importFromFiles: launching import for', files.length, 'files')
-  const features = await Promise.all(toLoad)
-  console.log('importFromFiles: finished, results per file:', features.map(f => Array.isArray(f) ? f.length : (f && f.length) || 0))
+    console.log('importFromFiles: launching import for', files.length, 'files')
+    const features = await Promise.all(toLoad)
+    console.log(
+      'importFromFiles: finished, results per file:',
+      features.map((f) => (Array.isArray(f) ? f.length : (f && f.length) || 0))
+    )
     return new Promise((resolve) => {
       resolve([].concat(...features))
     })
   }
 
   async importFromFile(file, type) {
-  type = type || Utils.detectFileType(file)
-  console.log('importFromFile: file metadata', { name: file?.name, size: file?.size, type })
+    type = type || Utils.detectFileType(file)
+    console.log('importFromFile: file metadata', {
+      name: file?.name,
+      size: file?.size,
+      type,
+    })
     const raw = await this.readFile(file)
     console.log('importFromFile: raw length', raw?.length)
     if (!raw) {
       // Inform the user that large files should be uploaded to the server
       Alert.error(
-        translate('Import produced no data. For large files, please upload them directly to the server.'),
+        translate(
+          'Import produced no data. For large files, please upload them directly to the server.'
+        ),
         8000
       )
       return []
@@ -738,9 +773,21 @@ export class DataLayer {
 
   async importFromUrl(uri, type) {
     uri = this._umap.renderUrl(uri)
-    return await this.getUrl(uri).then((raw) => {
-      return this.importRaw(raw, type)
-    })
+    try {
+      const raw = await this.getUrl(uri)
+      const features = await this.importRaw(raw, type)
+      if (!this.createdOnServer && this.features.count() === 0) {
+        delete this._umap.datalayers[this.id]
+        this._umap.onDataLayersChanged()
+      }
+      return features
+    } catch (error) {
+      if (!this.createdOnServer && this.features.count() === 0) {
+        delete this._umap.datalayers[this.id]
+        this._umap.onDataLayersChanged()
+      }
+      throw error
+    }
   }
 
   getColor() {
