@@ -477,7 +477,7 @@
             {
               name: 'layer-popup-interactions',
               selector: '',
-              title: "Pop-ups et interactions",
+              title: "Options d'intéraction",
               text: `<b>Pop-ups et interactions</b>
               </br></br>
               Vous pouvez modifier le comportement et l'apparence de ce pop-up depuis l'onglet "Options d'interaction"
@@ -496,10 +496,26 @@
               showPrev: false,
             },
             {
+              name: 'conditional-formatting-rules',
+              selector: '',
+              title: "Règles de formatage conditionnelles",
+              text: `<b>Règles de formatage conditionnelles</b>
+              </br></br>
+              Les règles de formatage conditionnelles permettent de modifier la symbologie au sein d'une même couche selon des conditions définies.
+              </br></br>
+              Par exemple, pour un jeu de données recensant les jardins d'une commune, si la métadonnée « privé » existe avec les valeurs « oui » ou « non », il est possible d'ajouter la condition « privé = oui » et d'adapter la symbologie afin de distinguer facilement les jardins privés des autres jardins du jeu de données.
+              </br></br>
+              Pour plus d'information sur les conditions possibles, veuillez-vous référer à la <a href="https://discover.umap-project.org/support/faq/#conditional-rules" target="_blank" rel="noopener">page d'aide associée</a>.
+              </br></br>
+              <i>Cliquez sur Suivant pour terminer.</i>`,
+              anchor: 'corner-bottom-left',
+              showPrev: false,
+            },
+            {
               name: 'tutorial-ended',
               selector: '',
               title: "Tutoriel terminé",
-              text: `Le tutoriel est terminé, vous pouvez le télécharger au format PDF sur le lien suivant : xxx
+              text: `Le tutoriel est terminé, vous pouvez le télécharger au format PDF sur le lien suivant : 
               </br></br>
               N'hésitez pas à consulter les boutons d'aides <span style="display:inline-block; width:16px; height:16px; background-color:#0078D7; color:white; border-radius:50%; text-align:center; line-height:16px; font-size:12px; font-weight:bold;">?</span> répartis dans l'interface pour obtenir des informations contextuelles.`,
               anchor: 'corner-bottom-left',

@@ -22,7 +22,23 @@ Dans le cadre de ce projet, uMap et l'API de données ont été installés sur u
 
 Veuillez suivre les instructions d'installation standard d'uMap disponibles dans la [documentation officielle](https://docs.umap-project.org/en/stable/install/).
 
+## Mise à jour du contenu
+
+Le contenu du site web doit être mis à jour directement depuis le code source disponible sur ce dépôt GitHub. Pour cela il faut donc faire les modifications nécessaires dans le code source et redéployer l'application.
+
 ## Configuration
+
+Un exemple de configuration, qui a été utilisé dans le cadre du projet est disponible dans le fichier `local_settings_example.py` à la racine du dépôt. Dans le cadre d'un déploiement il conviendra de changer à minima les clés d'API et les secrets pour les services d'authentification (ex : Github, OSM), les variable indiquant les URLs d'accès aux applications, ainsi que le mot de passe de protection simple :
+
+- `SOCIAL_AUTH_GITHUB_KEY`
+- `SOCIAL_AUTH_GITHUB_SECRET`
+- `SOCIAL_AUTH_OPENSTREETMAP_OAUTH2_KEY`
+- `SOCIAL_AUTH_OPENSTREETMAP_OAUTH2_SECRET`
+- `SITE_URL`
+- `UMAP_DATA_API`
+- `SIMPLE_PASSWORD_PROTECTION`
+
+De plus, il est possible d'ajouter des fonds de cartes et des licences personnalisées depuis les tables de la base Postgre créée suite à l'installation d'uMap. Pour cela, il suffit d'ajouter les entrées correspondantes dans les tables `umap_tilelayer` et `umap_licence` de la base de données.
 
 ### Protection par mot de passe (temporaire)
 
@@ -47,7 +63,7 @@ Pour désactiver la protection, définissez `SIMPLE_PASSWORD_PROTECTION = None` 
 ### Sources de données pour l'import
 
 Les sources de données utilisées dans l'assistant d'import peuvent être définies dans le fichier de configuration `local_settings.py` d'uMap.
-Dans la variable UMAP_IMPORTERS, il est possible d'ajouter des datasets provenant de l'API de données comme cela :
+Dans la variable `UMAP_IMPORTERS`, il est possible d'ajouter des datasets provenant de l'API de données comme cela :
 
 ```python
 {
@@ -97,34 +113,6 @@ UMAP_IMPORTERS = {
                 "format": "osm",
                 "source": "https://wiki.openstreetmap.org/wiki/Tag:leisure%3Drecreation_ground",
             },
-            # Itinéraires de tramways — split per route
-            {
-                "label": "Itinéraires de tramways — tram (OSM)",
-                "expression": "nwr[route=tram];out geom;",
-                "format": "osm",
-                "source": "https://wiki.openstreetmap.org/wiki/Tag:route%3Dtram",
-            },
-            {
-                "label": "Itinéraires de tramways — light_rail (OSM)",
-                "expression": "nwr[route=light_rail];out geom;",
-                "format": "osm",
-                "source": "https://wiki.openstreetmap.org/wiki/Tag:route%3Dlight_rail",
-            },
-            # Arbres — natural=tree
-            {
-                "label": "Arbres (OSM)",
-                "expression": "nwr[natural=tree];out geom;",
-                "format": "osm",
-                "source": "https://wiki.openstreetmap.org/wiki/FR:Tag:natural%3Dtree",
-            },
-            {
-                "label": "Arbres (namR)",
-                "data": "arbres",
-                "geographic_query": "commune",
-                "format": "umap-data",
-                "source": "https://www.data.gouv.fr/datasets/arbres-en-open-data-en-france-par-namr/",
-                "description": "Ce jeu de données concerne l’ensemble des arbres urbains référencés dans l’open data.",
-            },
         ],
     },
     # ---------------------------
@@ -148,185 +136,8 @@ UMAP_IMPORTERS = {
                 "format": "osm",
                 "source": "https://wiki.openstreetmap.org/wiki/FR:Tag:amenity%3Ddrinking_water",
                 "description": "Indique l'emplacement d'un robinet ou autre accès à de l'eau potable, ce qui inclut puits, robinets et sources.",
-            },
-            # Douches publiques
-            {
-                "label": "Douches publiques (OSM)",
-                "expression": "nwr[amenity=shower];out geom;",
-                "format": "osm",
-                "source": "https://wiki.openstreetmap.org/wiki/FR:Tag:amenity%3Dshower",
-                "description": "Douches publiques, où les gens peuvent se baigner sous des jets d'eau. Elles peuvent être gérées par les pouvoirs publics en tant qu'équipement local ou faire partie d'une offre commerciale et donc être payantes. Les douches de plage sont également signalées de cette manière.",
-            },
-            # Stockage d'eau
-            {
-                "label": "Stockage d'eau (OSM)",
-                "expression": "nwr[man_made=storage_tank][content=water];out geom;",
-                "format": "osm",
-                "source": "https://wiki.openstreetmap.org/wiki/Tag:man_made%3Dwater_tank",
-            },
-            # Points d'eau pour animaux
-            {
-                "label": "Points d'eau pour animaux (OSM)",
-                "expression": "nwr[amenity=watering_place];out geom;",
-                "format": "osm",
-                "source": "https://wiki.openstreetmap.org/wiki/FR:Tag:amenity%3Dwatering_place",
-                "description": "Cet attribut indique les endroits où les animaux peuvent boire de l'eau,",
-            },
-            # Espaces extérieurs rafraîchis : parcs, jardins, squares (split per tag)
-            {
-                "label": "Parcs (OSM)",
-                "expression": "nwr[leisure=park];out geom;",
-                "format": "osm",
-                "source": "https://wiki.openstreetmap.org/wiki/FR:Tag:leisure%3Dpark",
-            },
-            {
-                "label": "Jardins (OSM)",
-                "expression": "nwr[leisure=garden];out geom;",
-                "format": "osm",
-                "source": "https://wiki.openstreetmap.org/wiki/Tag:leisure%3Dgarden",
-            },
-            {
-                "label": "Squares (OSM)",
-                "expression": "nwr[place=square];out geom;",
-                "format": "osm",
-                "source": "https://wiki.openstreetmap.org/wiki/FR:Tag:place%3Dsquare",
-            },
-            {
-                "label": "BD Topage",
-                "data": "topage",
-                "geographic_query": "commune",
-                "format": "umap-data",
-                "source": "https://www.data.gouv.fr/fr/datasets/bd-topage-r/",
-                "description": "Le référentiel hydrographique vise à décrire les entités hydrographiques présentes sur le territoire français afin de constituer un référentiel national permettant de localiser des données relatives à l’eau.",
-            },
-        ],
-    },
-    # ---------------------------
-    #  SOLUTIONS GRISES
-    # ---------------------------
-    "datasets-3": {
-        "name": "Données grises",
-        "choices": [
-            # Musées
-            {
-                "label": "Musées (OSM)",
-                "expression": "nwr[tourism=museum];out geom;",
-                "format": "osm",
-                "source": "https://wiki.openstreetmap.org/wiki/Tag:tourism=museum",
-                "description": "Un musée. Institution qui présente des expositions sur des thèmes culturels, historiques, scientifiques. Peut être fortement impliqué dans l'acquisition, la conservation ou la recherche dans ces domaines. En général ouvert au public en tant qu'attraction touristique.",
-            },
-            # Centres commerciaux (shopping malls)
-            {
-                "label": "Centres commerciaux (OSM)",
-                "expression": "nwr[shop=mall];out geom;",
-                "format": "osm",
-                "source": "https://wiki.openstreetmap.org/wiki/Tag:shop=mall",
-            },
-            # Bâtiments publics / commerciaux (split per tag)
-            {
-                "label": "Bâtiments — commercial (OSM)",
-                "expression": "nwr[building=commercial];out geom;",
-                "format": "osm",
-                "source": "https://wiki.openstreetmap.org/wiki/Tag:building=commercial",
-            },
-            {
-                "label": "Bâtiments — retail (OSM)",
-                "expression": "nwr[building=retail];out geom;",
-                "format": "osm",
-                "source": "https://wiki.openstreetmap.org/wiki/Tag:building=retail",
-            },
-            {
-                "label": "Bâtiments — public_building (OSM)",
-                "expression": "nwr[amenity=public_building];out geom;",
-                "format": "osm",
-                "source": "https://wiki.openstreetmap.org/wiki/Tag:amenity=public_building",
-            },
-            {
-                "label": "Bâtiments — public (OSM)",
-                "expression": "nwr[building=public];out geom;",
-                "format": "osm",
-                "source": "https://wiki.openstreetmap.org/wiki/Tag:building=public",
-            },
-            # Ombrières — split per tag
-            {
-                "label": "Ombrières — canopy (OSM)",
-                "expression": "nwr[man_made=canopy];out geom;",
-                "format": "osm",
-                "source": "https://wiki.openstreetmap.org/wiki/Tag:man_made=canopy",
-            },
-            {
-                "label": "Ombrières — shelter (OSM)",
-                "expression": "nwr[amenity=shelter];out geom;",
-                "format": "osm",
-                "source": "https://wiki.openstreetmap.org/wiki/Tag:amenity=shelter",
-            },
-            {
-                "label": "Ombrières — tree (OSM)",
-                "expression": "nwr[natural=tree];out geom;",
-                "format": "osm",
-                "source": "https://wiki.openstreetmap.org/wiki/Tag:natural%3Dtree",
-            },
-            {
-                "label": "Ombrières — wood (OSM)",
-                "expression": "nwr[natural=wood];out geom;",
-                "format": "osm",
-                "source": "https://wiki.openstreetmap.org/wiki/Tag:natural=wood",
-            },
-            {
-                "label": "Réseau de froid",
-                "data": "reseaux-froid",
-                "geographic_query": "commune",
-                "format": "umap-data",
-                "source": "https://france-chaleur-urbaine.beta.gouv.fr/carte",
-            },
-            {
-                "label": "BPE - Base Permanente des Equipements",
-                "data": "bpe",
-                "geographic_query": "commune",
-                "format": "umap-data",
-                "source": "https://www.data.gouv.fr/fr/datasets/base-permanente-des-equipements-1/",
-                "description": "La BPE permet de mieux connaître les équipements de service à la population et le niveau de ces équipements sur un territoire. La base permanente des équipements (BPE) est une base de données qui vise à rassemble des données administratives relatives aux équipements de service à la population.",
-            },
-        ],
-    },
-    # ---------------------------
-    #  Everything else unchanged
-    # ---------------------------
-    "datasets-4": {
-        "name": "Données d'exposition",
-        "choices": [
-            {
-                "label": "MAPuCE",
-                "data": "mapuce",
-                "geographic_query": "commune",
-                "format": "umap-data",
-                "source": "https://github.com/orbisgis/mapuce.orbisgis.org/tree/gh-pages/data/icu",
-                "description": "Données sur les ICU. Travaux réalisés il y a 6 ans",
-            }
-        ],
-    },
-    "datasets-5": {
-        "name": "Données de contexte",
-        "choices": [
-            {
-                "label": "Population",
-                "data": "population",
-                "geographic_query": "commune",
-                "format": "umap-data",
             }
         ],
     },
 }
 ```
-
-Un exemple de configuration, qui a été utilisé dans le cadre du projet est disponible dans le fichier `local_settings_example.py` à la racine du dépôt. Dans le cadre d'un déploiement il conviendra de changer à minima les clés d'API et les secrets pour les services d'authentification (ex : Github, OSM), les variable indiquant les URLs d'accès aux applications, ainsi que le mot de passe de protection simple :
-
-- `SOCIAL_AUTH_GITHUB_KEY`
-- `SOCIAL_AUTH_GITHUB_SECRET`
-- `SOCIAL_AUTH_OPENSTREETMAP_OAUTH2_KEY`
-- `SOCIAL_AUTH_OPENSTREETMAP_OAUTH2_SECRET`
-- `SITE_URL`
-- `UMAP_DATA_API`
-- `SIMPLE_PASSWORD_PROTECTION`
-
-De plus, il est possible d'ajouter des fonds de cartes et des licences personnalisées depuis les tables de la base Postgre créée suite à l'installation d'uMap. Pour cela, il suffit d'ajouter les entrées correspondantes dans les tables `umap_basemap` et `umap_license` de la base de données.
