@@ -22,17 +22,23 @@ export class NOKError extends RequestError {
 class BaseRequest {
   async _fetch(method, uri, headers, data) {
     let response
+    const maxAttempts = this.retryCount || 3
 
-    try {
-      response = await fetch(uri, {
-        method: method,
-        mode: 'cors',
-        headers: headers,
-        body: data,
-      })
-    } catch (error) {
-      console.error(error)
-      throw new HTTPError(error.message)
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        response = await fetch(uri, {
+          method: method,
+          mode: 'cors',
+          headers: headers,
+          body: data,
+        })
+        break
+      } catch (error) {
+        if (attempt >= maxAttempts) {
+          console.error(error)
+          throw new HTTPError(error.message)
+        }
+      }
     }
     if (!response.ok) {
       throw new NOKError(response)
