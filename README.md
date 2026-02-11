@@ -11,7 +11,7 @@ Une API permettant de fournir les données relatives à notre cas d'usage a éga
 
 ## Installation
 
-Dans le cadre de ce projet, uMap et l'API de données ont été installés sur un serveur dédié avec les capacités et dépendances suivantes :
+Dans le cadre de ce projet, uMap et l'API de données ont été installés sur une VM dédiée avec les capacités et dépendances suivantes :
 
 - Ubuntu 22.04
 - Python 3.10.10
@@ -28,7 +28,7 @@ Le contenu du site web doit être mis à jour directement depuis le code source 
 
 ## Configuration
 
-Un exemple de configuration, qui a été utilisé dans le cadre du projet est disponible dans le fichier `local_settings_example.py` à la racine du dépôt. Dans le cadre d'un déploiement il conviendra de changer à minima les clés d'API et les secrets pour les services d'authentification (ex : Github, OSM), les variable indiquant les URLs d'accès aux applications, ainsi que le mot de passe de protection simple :
+Un exemple de configuration, qui a été utilisé dans le cadre du projet est disponible dans le fichier `local_settings_example.py` à la racine du dépôt. Dans le cadre d'un déploiement il conviendra de changer à minima les clés d'API et les secrets pour les services d'authentification (ex : Github, OSM), les variables indiquant les URLs d'accès aux applications, ainsi que le mot de passe de protection simple :
 
 - `SOCIAL_AUTH_GITHUB_KEY`
 - `SOCIAL_AUTH_GITHUB_SECRET`
