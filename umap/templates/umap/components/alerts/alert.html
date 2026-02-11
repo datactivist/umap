@@ -31,6 +31,7 @@
       <p>
         <em>{% blocktranslate %}Pro-tip: to easily find back your maps, <a href="{{ login_url }}" target="_blank">create an account</a> or <a href="{{ login_url }}" target="_blank">log in</a>.{% endblocktranslate %}</em>
       </p>
+
       <div id="link-wrapper">
         <form>
           <label for="url">
@@ -41,6 +42,15 @@
             <input type="button" value="{% translate "Copy link" %}">
           </fieldset>
         </form>
+        <div style="margin-top: 1.5em; padding: 1em; background-color: white; border-left: 4px solid #ff9800; font-size: 0.9em; color: black;">
+          <p><strong>Pour lier cette carte à votre compte après connexion :</strong></p>
+          <ol style="margin: 0.5em 0; padding-left: 1.5em; color: black;">
+            <li>Copiez et sauvegardez le lien d'édition ci-dessus</li>
+            <li>Une fois connecté, ouvrez la carte en mode édition avec ce lien</li>
+            <li>Allez dans « Changer les permissions et les éditeurs »</li>
+            <li>Cliquez sur « Actions avancées » puis « Lier cette carte à mon compte »</li>
+          </ol>
+        </div>
       </div>
       <div id="form-wrapper" hidden>
         <form>

@@ -4,7 +4,10 @@ import { BaseAjax, SingleMixin } from '../autocomplete.js'
 import { translate } from '../i18n.js'
 
 const TEMPLATE = `
-  <h3>Overpass</h3>
+  <h3>Overpasss</h3>
+  <div style="font-size: 0.85em; font-style: italic; color: #666; margin-top: 10px; margin-bottom: 10px; padding: 10px; background-color: #f5f5f5; border-left: 3px solid #ff9800;">
+    <strong>Avertissement :</strong> OSM étant collaboratif, la qualité varie selon les régions. Les zones urbaines des pays développés sont généralement très bien cartographiées, tandis que certaines zones rurales ou moins fréquentées peuvent être incomplètes ou obsolètes. Il est prudent de vérifier la fraîcheur des données pour votre zone d'intérêt et de croiser avec d'autres sources pour des applications critiques.
+  </div>
   <label>
     <span data-help="overpassImporter">${translate('Expression')}</span>
     <input type="text" placeholder="amenity=drinking_water" name="tags" />

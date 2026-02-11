@@ -221,7 +221,7 @@ export class TopBar extends WithTemplate {
           // Fallback: fit to mainland France bounds (includes metropole)
           const bounds = L.latLngBounds([
             [41.0, -5.5], // SW (approx southwestern tip)
-            [51.5, 9.6],  // NE (approx northeastern tip)
+            [51.5, 9.6], // NE (approx northeastern tip)
           ])
           this._umap._leafletMap.fitBounds(bounds)
         } catch (e) {

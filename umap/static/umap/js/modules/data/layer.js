@@ -341,21 +341,31 @@ export class DataLayer {
   }
 
   async getUrl(url, initialUrl) {
-    const response = await this._umap.request.get(url)
-    return new Promise((resolve, reject) => {
-      if (response?.ok) {
-        this._umap.modifiedAt = response.headers.get('last-modified')
-        return resolve(response.text())
+    const maxAttempts = this._umap.request.retryCount || 3
+    let response
+
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        response = await this._umap.request.get(url)
+        if (response?.ok) {
+          this._umap.modifiedAt = response.headers.get('last-modified')
+          return await response.text()
+        }
+      } catch (error) {
+        if (attempt >= maxAttempts) {
+          throw error
+        }
       }
-      const error = new Error('Failed to load remote data')
-      Alert.error(
-        translate('Cannot load remote data for layer "{layer}" with url "{url}"', {
-          layer: this.getName(),
-          url: initialUrl || url,
-        })
-      )
-      reject(error)
-    })
+    }
+
+    const error = new Error('Failed to load remote data')
+    Alert.error(
+      translate('Cannot load remote data for layer "{layer}" with url "{url}"', {
+        layer: this.getName(),
+        url: initialUrl || url,
+      })
+    )
+    throw error
   }
 
   async fetchRemoteData(force) {

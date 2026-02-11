@@ -41,6 +41,8 @@ export class Importer {
     this.searchUrl =
       options?.searchUrl ||
       'https://photon.komoot.io/api?q={q}&layer=county&layer=city&layer=state'
+    this.osmMode = false
+    this.boundaryChoice = null
   }
 
   async open(importer) {
@@ -110,18 +112,43 @@ export class Importer {
     })
     const descText = DomUtil.element({ tagName: 'span', parent: descLabel })
 
+    // --- OSM Warning ---
+    const osmWarning = DomUtil.create('div', '', container)
+    osmWarning.style.display = 'none'
+    osmWarning.style.fontSize = '0.85em'
+    osmWarning.style.fontStyle = 'italic'
+    osmWarning.style.color = '#666'
+    osmWarning.style.marginTop = '10px'
+    osmWarning.style.marginBottom = '10px'
+    osmWarning.style.padding = '10px'
+    osmWarning.style.backgroundColor = '#f5f5f5'
+    osmWarning.style.borderLeft = '3px solid #ff9800'
+    osmWarning.innerHTML = `<strong>Avertissement :</strong> OSM étant collaboratif, la qualité varie selon les régions. Les zones urbaines des pays développés sont généralement très bien cartographiées, tandis que certaines zones rurales ou moins fréquentées peuvent être incomplètes ou obsolètes. Il est prudent de vérifier la fraîcheur des données pour votre zone d'intérêt et de croiser avec d'autres sources pour des applications critiques.`
+
     // --- Area autocomplete (for OSM) ---
     const label = DomUtil.element({ tagName: 'label', id: 'area', parent: container })
-    DomUtil.element({
+    const areaLabelSpan = DomUtil.element({
       tagName: 'span',
       textContent: translate('Search area'),
       parent: label,
     })
+    const asterisk = DomUtil.element({
+      tagName: 'span',
+      textContent: ' *',
+      parent: areaLabelSpan,
+      style: { color: '#d32f2f' },
+    })
     this.autocomplete = new Autocomplete(label, {
       url: this.searchUrl,
-      placeholder: translate('Type area name (optional)'),
-      on_select: (choice) => (this.boundaryChoice = choice),
-      on_unselect: () => (this.boundaryChoice = null),
+      placeholder: translate('Type area name'),
+      on_select: (choice) => {
+        this.boundaryChoice = choice
+        this.updateButtonState()
+      },
+      on_unselect: () => {
+        this.boundaryChoice = null
+        this.updateButtonState()
+      },
     })
     label.style.display = 'none'
 
@@ -184,6 +211,15 @@ export class Importer {
     const geoSelect = DomUtil.create('select', '', geoSelectLabel)
     geoSelectLabel.style.display = 'none'
 
+    // Store button reference for visibility control
+    let acceptButton = null
+    const getAcceptButton = () => {
+      if (!acceptButton) {
+        acceptButton = document.querySelector('button[data-ref="accept"]')
+      }
+      return acceptButton
+    }
+
     // Unified change handler
     select.addEventListener('change', async () => {
       const option = select.options[select.selectedIndex]
@@ -197,6 +233,7 @@ export class Importer {
       geoSelectLabel.style.display = 'none'
       sourceLabel.style.display = 'none'
       descLabel.style.display = 'none'
+      osmWarning.style.display = 'none'
 
       // Show source and description if available
       if (option && option.dataset && option.dataset.source) {
@@ -205,16 +242,24 @@ export class Importer {
         sourceLabel.style.display = 'block'
       }
       if (option && option.dataset && option.dataset.description) {
-        descText.textContent = option.dataset.description
+        descText.innerHTML = option.dataset.description
         descLabel.style.display = 'block'
       }
 
       if (fmt === 'osm') {
+        this.osmMode = true
+        this.acceptButton = getAcceptButton()
         overpassContainer.style.display = ''
+        osmWarning.style.display = ''
         tagsInput.style.display = 'block'
         label.style.display = ''
         if (expr) tagsInput.value = expr.replace(/\[out:[^\]]*\];?/i, '')
+        this.updateButtonState()
         return
+      } else {
+        this.osmMode = false
+        this.acceptButton = getAcceptButton()
+        this.updateButtonState()
       }
 
       if (fmt === 'umap-data') {
@@ -300,6 +345,14 @@ export class Importer {
           Alert && Alert.error && Alert.error(translate('Expression is empty'))
           return
         }
+        if (!this.boundaryChoice) {
+          Alert &&
+            Alert.error &&
+            Alert.error(
+              translate('Choisissez une zone géographique via "Filter par zone"')
+            )
+          return
+        }
         expr = expr.replace(/^\s*\[out:[^\]]*\]\s*;?/i, '')
         expr = expr.replace(/;?\s*out\s+[^;]+;?\s*$/i, '')
         const isElementExpr = /^\s*(?:nwr|node|way|relation|\()/i.test(expr)
@@ -359,7 +412,7 @@ export class Importer {
         if (!selectedFilter) {
           Alert &&
             Alert.error &&
-            Alert.error(translate('Please select a geographic filter'))
+            Alert.error(translate('Veuillez sélectionner un filtre géographique'))
           return
         }
         const url = `${base}datasets/${labelSlug}?${encodeURIComponent(geographicQuery)}=${encodeURIComponent(selectedFilter)}`
@@ -383,5 +436,28 @@ export class Importer {
         cancel: false,
       })
       .then(confirm)
+      .then(() => {
+        this.osmMode = false
+        this.boundaryChoice = null
+      })
+  }
+
+  updateButtonState() {
+    // Find the accept button in the dialog
+    if (!this.acceptButton) {
+      this.acceptButton = document.querySelector('button[data-ref="accept"]')
+    }
+    const acceptButton = this.acceptButton
+    if (!acceptButton) {
+      return
+    }
+
+    if (this.osmMode && !this.boundaryChoice) {
+      // Hide button when OSM is selected but no boundaries chosen
+      acceptButton.style.display = 'none'
+    } else {
+      // Show button for non-OSM formats or when boundaries are selected
+      acceptButton.style.display = ''
+    }
   }
 }

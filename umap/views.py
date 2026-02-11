@@ -635,7 +635,7 @@ class MapDetailMixin(SessionMixin):
             "featuresHaveOwner": settings.UMAP_DEFAULT_FEATURES_HAVE_OWNERS,
             "websocketEnabled": settings.REALTIME_ENABLED,
             "importers": settings.UMAP_IMPORTERS,
-            "UMAP_DATA_API": getattr(settings, 'UMAP_DATA_API', None),
+            "UMAP_DATA_API": getattr(settings, "UMAP_DATA_API", None),
             "defaultLabelKeys": settings.UMAP_LABEL_KEYS,
             "help_links": settings.UMAP_HELP_LINKS,
             "focus_country": settings.UMAP_FOCUS_COUNTRY,
@@ -658,9 +658,13 @@ class MapDetailMixin(SessionMixin):
             edit_statuses = Map.ANONYMOUS_EDIT_STATUS
             datalayer_statuses = DataLayer.ANONYMOUS_EDIT_STATUS
             share_statuses = Map.ANONYMOUS_SHARE_STATUS
-        properties["edit_statuses"] = [(i, str(label)) for i, label in edit_statuses]
+        properties["edit_statuses"] = [
+            (i, "Par défaut (inhérite du choix de la carte)" if i == 0 else str(label))
+            for i, label in edit_statuses
+        ]
         properties["datalayer_edit_statuses"] = [
-            (i, str(label)) for i, label in datalayer_statuses
+            (i, "Par défaut (inhérite du choix de la carte)" if i == 0 else str(label))
+            for i, label in datalayer_statuses
         ]
         properties["share_statuses"] = [
             (i, str(label))
@@ -1139,19 +1143,19 @@ class SetSimplifiedMode(View):
         # Try JSON
         simplified = None
         try:
-            data = json.loads(request.body.decode('utf-8') or '{}')
-            simplified = data.get('simplified')
+            data = json.loads(request.body.decode("utf-8") or "{}")
+            simplified = data.get("simplified")
         except Exception:
             simplified = None
         if simplified is None:
             # Fallback to POST data
-            simplified = request.POST.get('simplified')
+            simplified = request.POST.get("simplified")
         # Normalize to boolean
         if isinstance(simplified, str):
-            simplified = simplified.lower() in ('1', 'true', 'yes', 'on')
+            simplified = simplified.lower() in ("1", "true", "yes", "on")
         else:
             simplified = bool(simplified)
-        request.session['simplified_mode'] = simplified
+        request.session["simplified_mode"] = simplified
         request.session.modified = True
         return simple_json_response(simplified=simplified)
 
@@ -1306,9 +1310,13 @@ class DataLayerCreate(FormLessEditMixin, CreateView):
                     geojson_bytes = gpkg_to_geojson(geofile.file)
                     # Save the converted GeoJSON into the model field without
                     # saving the instance yet.
-                    form.instance.geojson.save(f"{uuid}.geojson", ContentFile(geojson_bytes), save=False)
+                    form.instance.geojson.save(
+                        f"{uuid}.geojson", ContentFile(geojson_bytes), save=False
+                    )
                 except Exception as err:
-                    return HttpResponseBadRequest(f"Failed to convert GeoPackage: {err}")
+                    return HttpResponseBadRequest(
+                        f"Failed to convert GeoPackage: {err}"
+                    )
 
         self.object = form.save()
         assert uuid == self.object.uuid
@@ -1508,6 +1516,13 @@ design_system = DesignSystem.as_view()
 def webmanifest(request):
     return simple_json_response(
         **{
+            "name": "uMap",
+            "short_name": "uMap",
+            "start_url": "/",
+            "display": "standalone",
+            "background_color": "#ffffff",
+            "theme_color": "#3c8dbc",
+            "orientation": "portrait-or-landscape",
             "icons": [
                 {
                     "src": staticfiles_storage.url("umap/favicons/icon-192.png"),
@@ -1519,7 +1534,7 @@ def webmanifest(request):
                     "type": "image/png",
                     "sizes": "512x512",
                 },
-            ]
+            ],
         }
     )
 
@@ -1573,7 +1588,7 @@ def simple_login_view(request):
     if request.method == "POST":
         password = request.POST.get("password", "")
         correct_password = getattr(settings, "SIMPLE_PASSWORD_PROTECTION", None)
-        
+
         if password == correct_password:
             request.session["simple_password_authenticated"] = True
             # Redirect to home page after successful login
@@ -1581,10 +1596,9 @@ def simple_login_view(request):
             return HttpResponseRedirect(next_url)
         else:
             return render(
-                request, 
-                "umap/simple_login.html", 
-                {"error": "Incorrect password. Please try again."}
+                request,
+                "umap/simple_login.html",
+                {"error": "Incorrect password. Please try again."},
             )
-    
-    return render(request, "umap/simple_login.html")
 
+    return render(request, "umap/simple_login.html")

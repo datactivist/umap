@@ -67,14 +67,14 @@ AUTHENTICATION_BACKENDS = (
 )
 SOCIAL_AUTH_GITHUB_KEY = "GITHUB_KEY"
 SOCIAL_AUTH_GITHUB_SECRET = "GITHUB_SECRET"
-SOCIAL_AUTH_BITBUCKET_KEY = "xxx"
-SOCIAL_AUTH_BITBUCKET_SECRET = "xxx"
+SOCIAL_AUTH_BITBUCKET_KEY = "BITBUCKET_KEY"
+SOCIAL_AUTH_BITBUCKET_SECRET = "BITBUCKET_SECRET"
 # We need email to associate with other Oauth providers
 SOCIAL_AUTH_GITHUB_SCOPE = [
     "user:email",
 ]
-SOCIAL_AUTH_TWITTER_KEY = "xxx"
-SOCIAL_AUTH_TWITTER_SECRET = "xxx"
+SOCIAL_AUTH_TWITTER_KEY = "TWITTER_KEY"
+SOCIAL_AUTH_TWITTER_SECRET = "TWITTER_SECRET"
 SOCIAL_AUTH_OPENSTREETMAP_OAUTH2_KEY = "OSM_KEY"
 SOCIAL_AUTH_OPENSTREETMAP_OAUTH2_SECRET = "OSM_SECRET"
 MIDDLEWARE += ("social_django.middleware.SocialAuthExceptionMiddleware",)
@@ -198,7 +198,7 @@ UMAP_IMPORTERS = {
                 "geographic_query": "commune",
                 "format": "umap-data",
                 "source": "https://www.data.gouv.fr/datasets/arbres-en-open-data-en-france-par-namr/",
-                "description": "Ce jeu de données concerne l’ensemble des arbres urbains référencés dans l’open data.",
+                "description": "Ce jeu de données concerne l’ensemble des arbres urbains référencés dans l’open data. Pour plus d'information, se reporter à a description du jeu de données dans le lien qui mène à la source.",
             },
         ],
     },
@@ -355,12 +355,12 @@ UMAP_IMPORTERS = {
                 "source": "https://france-chaleur-urbaine.beta.gouv.fr/carte",
             },
             {
-                "label": "BPE - Base Permanente des Equipements",
+                "label": "BPE - Base Permanente des Equipements (Aires de jeux)",
                 "data": "bpe",
                 "geographic_query": "commune",
                 "format": "umap-data",
                 "source": "https://www.data.gouv.fr/fr/datasets/base-permanente-des-equipements-1/",
-                "description": "La BPE permet de mieux connaître les équipements de service à la population et le niveau de ces équipements sur un territoire. La base permanente des équipements (BPE) est une base de données qui vise à rassemble des données administratives relatives aux équipements de service à la population.",
+                "description": "La BPE permet de mieux connaître les équipements de service à la population et le niveau de ces équipements sur un territoire. La base permanente des équipements (BPE) est une base de données qui vise à rassemble des données administratives relatives aux équipements de service à la population. Les données de la BPE concernent uniquement les aires de jeux afin de pouvoir répondre à l'enjeu de surchauffe des jeux et équipements pour les enfants (cf tavaux de Plus fraîche ma ville : https://plusfraichemaville.fr/fiche-solution/jeux-et-equipements-durables-ecoles).",
             },
         ],
     },

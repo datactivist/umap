@@ -16,16 +16,21 @@ def simple_password_middleware(get_response):
         raise MiddlewareNotUsed
 
     def middleware(request):
-        # Skip password check for the login page itself and static files
-        if request.path == "/simple-login/" or request.path.startswith("/static/"):
+        # Skip password check for login page, manifest, favicon and static files
+        if (
+            request.path == "/simple-login/"
+            or request.path == "/manifest.webmanifest"
+            or request.path == "/favicon.ico"
+            or request.path.startswith("/static/")
+        ):
             return get_response(request)
-        
+
         # Check if user has authenticated with the simple password
         if not request.session.get("simple_password_authenticated", False):
             return HttpResponseRedirect("/simple-login/")
-        
+
         return get_response(request)
-    
+
     return middleware
 
 

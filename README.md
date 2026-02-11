@@ -24,7 +24,16 @@ Veuillez suivre les instructions d'installation standard d'uMap disponibles dans
 
 ## Mise à jour du contenu
 
-Le contenu du site web doit être mis à jour directement depuis le code source disponible sur ce dépôt GitHub. Pour cela il faut donc faire les modifications nécessaires dans le code source et redéployer l'application.
+Le contenu du site web doit être mis à jour directement depuis le code source disponible sur ce dépôt GitHub. Pour cela il faut donc faire les modifications nécessaires dans le code source puis redéployer l'application via la méthodedé déploiement mise en place dans votre architecture.
+
+Par exemple, si vous souhaitez modifiez le lien de téléchargement du bouton "Tutoriel" ainsi que celui dans les pop-ups du tutoriel :
+
+- Télécharger le code source depuis ce dépôt et l'ouvrir dans l'éditeur de code de votre choix
+- Trouver les occurrences du lien de téléchargement dans le code source via l'outil de recherche de votre éditeur (ex : rechercher `https://datactivist.github.io/umap-tutorial/`).
+- Remplacer ces occurences par le nouveau lien.
+- Redéployer l'application.
+
+Alternativement, il est possible de faire les changements directement depuis Github (ou un autre outil de gestion de code source selon où votre code est hébergé) en utilisant l'interface de recherche et de modification de fichiers, puis de redéployer l'application.
 
 ## Configuration
 
@@ -76,7 +85,9 @@ Dans la variable `UMAP_IMPORTERS`, il est possible d'ajouter des datasets proven
 },
 ```
 
-Voici un exemple de configuration qui utilise entre autres l'API Overpass pour OpenStreetMap ainsi qu'une API développée pour notre cas d'usage :
+Voici un exemple de configuration qui utilise entre autres l'API Overpass pour OpenStreetMap ainsi qu'une API développée dans le cadre de ce projet qui permet de fournir des données relatives à notre cas d'usage. Ces données ont été sélectionnées et prétraitées pour être utilisées dans le cadre de l'assistant d'import d'uMap. La documentation d'installation de cette API, ainsi que la méthode pour ajouter de nouvelles données sont disponible dans le dépôt dédié à celle-ci : [Documentation API](https://github.com/datactivist/umap-data-api).
+
+Pour ajouter une API qui ne figure pas parmis celles déjà supportées (**overpass, communesfr, cadastrefr, banfr, API du cas d'usage**), il est nécessaire de réaliser une **intégration spécifique** à la nouvelle API dans le code de uMap, en suivant la structure des intégrations existantes. Cela peut inclure la création d'une nouvelle classe d'importateur qui gère les requêtes à l'API et le formatage des données pour qu'elles soient compatibles avec uMap.
 
 ```python
 UMAP_IMPORTERS = {
