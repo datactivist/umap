@@ -77,7 +77,7 @@ Les sources de données utilisées dans l'assistant d'import peuvent être défi
 
 Une partie des données ont été sélectionnées et prétraités pour répondre à notre cas d'usage. Pour importer ces données depuis umap, nous avons développé une API et son connecteur associé. **La documentation d'installation de l'API qui permet de fournir ces données, ainsi que la méthode pour ajouter de nouvelles données à celle-ci sont disponible dans le dépôt dédié : [Documentation API](https://github.com/datactivist/umap-data-api).**
 
-Le fonctionnement au niveau de la configuration est donc le même aussi bien pour les connecteurs d'API existantes que pour celui que nous avons développé pour notre cas d'usage.
+Le fonctionnement au niveau de la configuration est donc le même aussi bien pour les connecteurs d'API existants que pour celui que nous avons développé pour notre cas d'usage.
 
 Pour ajouter un connecteur à une API qui ne figure pas parmis ceux déjà supportées (**overpass, communesfr, cadastrefr, banfr, API du cas d'usage**), il est nécessaire de réaliser une **intégration spécifique** à la nouvelle API dans le code de uMap, en suivant la structure des intégrations existantes. Cela peut inclure la création d'une nouvelle classe d'importateur qui gère les requêtes à l'API et le formatage des données pour qu'elles soient compatibles avec uMap.
 
