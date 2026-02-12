@@ -75,7 +75,11 @@ Pour désactiver la protection, définissez `SIMPLE_PASSWORD_PROTECTION = None` 
 
 Les sources de données utilisées dans l'assistant d'import peuvent être définies dans le fichier de configuration `local_settings.py` d'uMap. Dans la variable `UMAP_IMPORTERS`, où il est possible de définir le label, la requête d'extraction des données, le format de ces données, ainsi que la source et une description de celles-ci.
 
-Une partie des données ont été sélectionnées et prétraités pour répondre à notre cas d'usage. **La documentation d'installation de l'API qui permet de fournir ces données, ainsi que la méthode pour ajouter de nouvelles données à celle-ci sont disponible dans le dépôt dédié : [Documentation API](https://github.com/datactivist/umap-data-api).**
+Une partie des données ont été sélectionnées et prétraités pour répondre à notre cas d'usage. Pour importer ces données depuis umap, nous avons développé une API et son connecteur associé. **La documentation d'installation de l'API qui permet de fournir ces données, ainsi que la méthode pour ajouter de nouvelles données à celle-ci sont disponible dans le dépôt dédié : [Documentation API](https://github.com/datactivist/umap-data-api).**
+Le fonctionnement au niveau de la configuration est donc le même aussi bien pour les connecteurs d'API existantes que pour celui que nous avons développé pour notre cas d'usage.
+Pour ajouter un connecteur à une API qui ne figure pas parmis ceux déjà supportées (**overpass, communesfr, cadastrefr, banfr, API du cas d'usage**), il est nécessaire de réaliser une **intégration spécifique** à la nouvelle API dans le code de uMap, en suivant la structure des intégrations existantes. Cela peut inclure la création d'une nouvelle classe d'importateur qui gère les requêtes à l'API et le formatage des données pour qu'elles soient compatibles avec uMap.
+
+
 
 Voici un exemple de configuration de la variable `UMAP_IMPORTERS`. _Pour un exemple complet de la configuration utilisé dans le cadre du projet, veuillez vous référer au fichier `local_settings_example.py` à la racine du dépôt._
 
@@ -132,5 +136,3 @@ UMAP_IMPORTERS = {
     },
 }
 ```
-
-Pour ajouter une API qui ne figure pas parmis celles déjà supportées (**overpass, communesfr, cadastrefr, banfr, API du cas d'usage**), il est nécessaire de réaliser une **intégration spécifique** à la nouvelle API dans le code de uMap, en suivant la structure des intégrations existantes. Cela peut inclure la création d'une nouvelle classe d'importateur qui gère les requêtes à l'API et le formatage des données pour qu'elles soient compatibles avec uMap.
