@@ -35,6 +35,8 @@ Par exemple, si vous souhaitez modifiez le lien de téléchargement du bouton "T
 
 Alternativement, il est possible de faire les changements directement depuis Github (ou un autre outil de gestion de code source selon où votre code est hébergé) en utilisant l'interface de recherche et de modification de fichiers, puis de redéployer l'application.
 
+Si vous souhaitez faire des modifications sur la description des fichiers importés,
+
 ## Configuration
 
 Un exemple de configuration, qui a été utilisé dans le cadre du projet est disponible dans le fichier `local_settings_example.py` à la racine du dépôt. Dans le cadre d'un déploiement il conviendra de changer à minima les clés d'API et les secrets pour les services d'authentification (ex : Github, OSM), les variables indiquant les URLs d'accès aux applications, ainsi que le mot de passe de protection simple :
@@ -71,23 +73,11 @@ Pour désactiver la protection, définissez `SIMPLE_PASSWORD_PROTECTION = None` 
 
 ### Sources de données pour l'import
 
-Les sources de données utilisées dans l'assistant d'import peuvent être définies dans le fichier de configuration `local_settings.py` d'uMap.
-Dans la variable `UMAP_IMPORTERS`, il est possible d'ajouter des datasets provenant de l'API de données comme cela :
+Les sources de données utilisées dans l'assistant d'import peuvent être définies dans le fichier de configuration local_settings.py d'uMap. Dans la variable UMAP_IMPORTERS.
 
-```python
-{
-    "label": "Arbres (namR)",
-    "data": "arbres", # Nom de la clé dans l'API
-    "geographic_query": "commune", # Geographic filter in the API
-    "format": "umap-data",
-    "source": "https://www.data.gouv.fr/datasets/arbres-en-open-data-en-france-par-namr/",
-    "description": "Ce jeu de données concerne l’ensemble des arbres urbains référencés dans l’open data.",
-},
-```
+Une partie des données ont été sélectionnées et prétraités pour répondre à notre cas d'usage. **La documentation d'installation de l'API qui permet de fournir ces données, ainsi que la méthode pour ajouter de nouvelles données à celle-ci sont disponible dans le dépôt dédié : [Documentation API](https://github.com/datactivist/umap-data-api).**
 
-Voici un exemple de configuration qui utilise entre autres l'API Overpass pour OpenStreetMap ainsi qu'une API développée dans le cadre de ce projet qui permet de fournir des données relatives à notre cas d'usage. Ces données ont été sélectionnées et prétraitées pour être utilisées dans le cadre de l'assistant d'import d'uMap. La documentation d'installation de cette API, ainsi que la méthode pour ajouter de nouvelles données sont disponible dans le dépôt dédié à celle-ci : [Documentation API](https://github.com/datactivist/umap-data-api).
-
-Pour ajouter une API qui ne figure pas parmis celles déjà supportées (**overpass, communesfr, cadastrefr, banfr, API du cas d'usage**), il est nécessaire de réaliser une **intégration spécifique** à la nouvelle API dans le code de uMap, en suivant la structure des intégrations existantes. Cela peut inclure la création d'une nouvelle classe d'importateur qui gère les requêtes à l'API et le formatage des données pour qu'elles soient compatibles avec uMap.
+Voici un exemple de configuration de la variable `UMAP_IMPORTERS`. Pour un exemple complet de la configuration utilisé dans le cadre du projet, veuillez vous référer au fichier `local_settings_example.py` à la racine du dépôt.
 
 ```python
 UMAP_IMPORTERS = {
@@ -107,22 +97,12 @@ UMAP_IMPORTERS = {
                 "source": "https://wiki.openstreetmap.org/wiki/Tag:landuse%3Dgrass",
             },
             {
-                "label": "Espaces verts — forest (OSM)",
-                "expression": "nwr[landuse=forest];out geom;",
-                "format": "osm",
-                "source": "https://wiki.openstreetmap.org/wiki/Tag:landuse%3Dforest",
-            },
-            {
-                "label": "Espaces verts — nature_reserve (OSM)",
-                "expression": "nwr[leisure=nature_reserve];out geom;",
-                "format": "osm",
-                "source": "https://wiki.openstreetmap.org/wiki/Tag:leisure%3Dnature_reserve",
-            },
-            {
-                "label": "Espaces verts — recreation_ground (OSM)",
-                "expression": "nwr[leisure=recreation_ground];out geom;",
-                "format": "osm",
-                "source": "https://wiki.openstreetmap.org/wiki/Tag:leisure%3Drecreation_ground",
+                "label": "Arbres (namR)",
+                "data": "arbres", # Nom de la clé dans l'API
+                "geographic_query": "commune", # Geographic filter in the API
+                "format": "umap-data",
+                "source": "https://www.data.gouv.fr/datasets/arbres-en-open-data-en-france-par-namr/",
+                "description": "Ce jeu de données concerne l’ensemble des arbres urbains référencés dans l’open data.",
             },
         ],
     },
@@ -140,15 +120,17 @@ UMAP_IMPORTERS = {
                 "source": "https://wiki.openstreetmap.org/wiki/Tag:amenity%3Dfountain",
                 "description": "Une fontaine ayant une importance culturelle, décorative ou historique ou qui sert à des fins récréatives.",
             },
-            # Fontaines à eau potable
             {
-                "label": "Fontaines à eau potable (OSM)",
-                "expression": "nwr[amenity=drinking_water];out geom;",
-                "format": "osm",
-                "source": "https://wiki.openstreetmap.org/wiki/FR:Tag:amenity%3Ddrinking_water",
-                "description": "Indique l'emplacement d'un robinet ou autre accès à de l'eau potable, ce qui inclut puits, robinets et sources.",
-            }
+                "label": "BD Topage",
+                "data": "topage",
+                "geographic_query": "commune",
+                "format": "umap-data",
+                "source": "https://www.data.gouv.fr/fr/datasets/bd-topage-r/",
+                "description": "Le référentiel hydrographique vise à décrire les entités hydrographiques présentes sur le territoire français afin de constituer un référentiel national permettant de localiser des données relatives à l’eau.",
+            },
         ],
     },
 }
 ```
+
+Pour ajouter une API qui ne figure pas parmis celles déjà supportées (**overpass, communesfr, cadastrefr, banfr, API du cas d'usage**), il est nécessaire de réaliser une **intégration spécifique** à la nouvelle API dans le code de uMap, en suivant la structure des intégrations existantes. Cela peut inclure la création d'une nouvelle classe d'importateur qui gère les requêtes à l'API et le formatage des données pour qu'elles soient compatibles avec uMap.
