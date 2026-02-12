@@ -356,7 +356,7 @@ const locale = {
   'Stop editing': 'Quitter le mode édition',
   'Stop slideshow': 'Arrêter',
   'Street': 'Rue',
-  'stroke': 'trait',
+  'stroke': 'Trait',
   'Supported scheme': 'Schéma supporté',
   'Supported variables that will be dynamically replaced':
     'Variables qui seront automatiquement remplacées',

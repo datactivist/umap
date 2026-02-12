@@ -35,7 +35,7 @@ Par exemple, si vous souhaitez modifiez le lien de téléchargement du bouton "T
 
 Alternativement, il est possible de faire les changements directement depuis Github (ou un autre outil de gestion de code source selon où votre code est hébergé) en utilisant l'interface de recherche et de modification de fichiers, puis de redéployer l'application.
 
-Si vous souhaitez faire des modifications sur la description des fichiers importés,
+Si vous souhaitez faire des modifications sur la description des fichiers importés, il est possible de le faire depuis la configuration d'uMap, comme indiqué dans le chapitre [Sources de données pour l'import](#sources-de-données-pour-limport) ci-dessous.
 
 ## Configuration
 
@@ -73,11 +73,11 @@ Pour désactiver la protection, définissez `SIMPLE_PASSWORD_PROTECTION = None` 
 
 ### Sources de données pour l'import
 
-Les sources de données utilisées dans l'assistant d'import peuvent être définies dans le fichier de configuration local_settings.py d'uMap. Dans la variable UMAP_IMPORTERS.
+Les sources de données utilisées dans l'assistant d'import peuvent être définies dans le fichier de configuration `local_settings.py` d'uMap. Dans la variable `UMAP_IMPORTERS`, où il est possible de définir le label, la requête d'extraction des données, le format de ces données, ainsi que la source et une description de celles-ci.
 
 Une partie des données ont été sélectionnées et prétraités pour répondre à notre cas d'usage. **La documentation d'installation de l'API qui permet de fournir ces données, ainsi que la méthode pour ajouter de nouvelles données à celle-ci sont disponible dans le dépôt dédié : [Documentation API](https://github.com/datactivist/umap-data-api).**
 
-Voici un exemple de configuration de la variable `UMAP_IMPORTERS`. Pour un exemple complet de la configuration utilisé dans le cadre du projet, veuillez vous référer au fichier `local_settings_example.py` à la racine du dépôt.
+Voici un exemple de configuration de la variable `UMAP_IMPORTERS`. _Pour un exemple complet de la configuration utilisé dans le cadre du projet, veuillez vous référer au fichier `local_settings_example.py` à la racine du dépôt._
 
 ```python
 UMAP_IMPORTERS = {

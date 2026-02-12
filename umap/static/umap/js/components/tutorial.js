@@ -47,15 +47,21 @@ class Tutorial {
     if (this.tourId) {
       try {
         const skippedKey = 'umapTutorialEnded_' + this.tourId
-        const isSkipped =
-          window.localStorage && window.localStorage.getItem(skippedKey) === '1'
+        const storedValue =
+          window.localStorage && window.localStorage.getItem(skippedKey)
+        const isSkipped = storedValue && this.isExpiredTimestamp(storedValue) === false
         if (isSkipped) {
           console.log(
             '[Tutorial] skipped (key:',
             skippedKey,
-            'is set to 1); not starting'
+            'expires at:',
+            storedValue,
+            '); not starting'
           )
           return
+        } else if (storedValue) {
+          // Clear expired entry
+          window.localStorage.removeItem(skippedKey)
         }
       } catch (err) {
         console.log('[Tutorial] failed to check skip status', err)
@@ -86,16 +92,22 @@ class Tutorial {
     if (this.tourId) {
       try {
         const skippedKey = 'umapTutorialEnded_' + this.tourId
-        const isSkipped =
-          window.localStorage && window.localStorage.getItem(skippedKey) === '1'
+        const storedValue =
+          window.localStorage && window.localStorage.getItem(skippedKey)
+        const isSkipped = storedValue && this.isExpiredTimestamp(storedValue) === false
         if (isSkipped) {
           console.log(
             '[Tutorial] skipped (key:',
             skippedKey,
-            'is set to 1); not showing step'
+            'expires at:',
+            storedValue,
+            '); not showing step'
           )
           this.cleanup()
           return
+        } else if (storedValue) {
+          // Clear expired entry
+          window.localStorage.removeItem(skippedKey)
         }
       } catch (err) {
         console.log('[Tutorial] failed to check skip status', err)
@@ -447,13 +459,27 @@ class Tutorial {
     console.log('[Tutorial] ending tour', { explicitEnded, tourId: this.tourId })
     try {
       if (window.localStorage && this.tourId) {
-        // mark this specific tour as ended
-        window.localStorage.setItem('umapTutorialEnded_' + this.tourId, '1')
+        // mark this specific tour as ended with 24-hour expiration
+        const expiresAt = Date.now() + 24 * 60 * 60 * 1000 // 24 hours from now
+        window.localStorage.setItem(
+          'umapTutorialEnded_' + this.tourId,
+          String(expiresAt)
+        )
       }
     } catch (err) {
       /* ignore storage errors */
     }
     this.cleanup()
+  }
+
+  // Check if a stored timestamp has expired (returns true if expired, false if still valid)
+  isExpiredTimestamp(timestamp) {
+    try {
+      const expireTime = parseInt(timestamp, 10)
+      return isNaN(expireTime) ? true : Date.now() > expireTime
+    } catch (err) {
+      return true
+    }
   }
 
   // Explicit skip action (marks only this tour as ended)

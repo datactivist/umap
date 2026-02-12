@@ -13,12 +13,14 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import quote_plus, urlparse
 from urllib.request import Request, build_opener
 
+import pytz
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import BACKEND_SESSION_KEY, get_user_model
 from django.contrib.auth import logout as do_logout
 from django.contrib.gis.measure import D
 from django.contrib.postgres.search import SearchQuery, SearchVector
+from django.utils import timezone
 from django.contrib.sessions.models import Session
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.exceptions import PermissionDenied
@@ -374,6 +376,22 @@ class Search(PaginatorMixin, TemplateView, PublicMapsMixin, SearchMixin):
 search = Search.as_view()
 
 
+def localize_maps_modified_at(maps):
+    """Convert each map's modified_at to CET timezone and format as string."""
+    cet = pytz.timezone("Europe/Paris")  # CET/CEST zone
+    for map_inst in maps:
+        if map_inst.modified_at:
+            # Convert to CET
+            if map_inst.modified_at.tzinfo is None:
+                # Assume UTC if naive
+                cet_time = pytz.utc.localize(map_inst.modified_at).astimezone(cet)
+            else:
+                cet_time = map_inst.modified_at.astimezone(cet)
+            # Format as string to preserve the CET timezone in display
+            map_inst.modified_at = cet_time.strftime("%Y-%m-%d %H:%M:%S")
+    return maps
+
+
 class UserDashboard(PaginatorMixin, DetailView, SearchMixin):
     model = User
     template_name = "umap/user_dashboard.html"
@@ -392,6 +410,8 @@ class UserDashboard(PaginatorMixin, DetailView, SearchMixin):
 
     def get_context_data(self, **kwargs):
         page = self.paginate(self.get_maps(), settings.UMAP_MAPS_PER_PAGE_OWNER)
+        # Convert modified_at to local timezone
+        localize_maps_modified_at(page.object_list)
         kwargs.update({"q": self.request.GET.get("q"), "maps": page})
         return super().get_context_data(**kwargs)
 
@@ -414,6 +434,8 @@ class UserTemplates(PaginatorMixin, DetailView, SearchMixin):
 
     def get_context_data(self, **kwargs):
         page = self.paginate(self.get_maps(), settings.UMAP_MAPS_PER_PAGE_OWNER)
+        # Convert modified_at to local timezone
+        localize_maps_modified_at(page.object_list)
         kwargs.update({"q": self.request.GET.get("q"), "maps": page})
         return super().get_context_data(**kwargs)
 

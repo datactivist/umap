@@ -36,22 +36,21 @@
             </th>
             <td>
               <umap-modal data-settings='{{ map_inst.preview_settings|dumps|escape }}' data-map-id="{{ unique_id }}">
-                <button class="map-icon map-opener"
-                        title="{% translate "Open preview" %}">
-                  <span class="icon-dashboard icon-view"></span>
-                  <span class="sr-only">{% translate "Open preview" %}</span>
-                </button>
-                <dialog>
-                  <form method="dialog">
-                    <div id="{{ unique_id }}_target" class="map_fragment">
-                    </div>
-                    <p class="close-dialog">
-                      <button class="button" type="submit">
-                        Close
-                      </button>
-                    </p>
-                  </form>
-                </dialog>
+              <button class="map-icon map-opener" title="{% translate "Open preview" %}">
+                <span class="icon-dashboard icon-view"></span>
+                <span class="sr-only">{% translate "Open preview" %}</span>
+              </button>
+              <dialog>
+                <form method="dialog">
+                  <div id="{{ unique_id }}_target" class="map_fragment">
+                  </div>
+                  <p class="close-dialog">
+                    <button class="button" type="submit">
+                      Close
+                    </button>
+                  </p>
+                </form>
+              </dialog>
               </umap-modal>
             </td>
             <td>

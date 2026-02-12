@@ -123,7 +123,7 @@ export class Importer {
     osmWarning.style.padding = '10px'
     osmWarning.style.backgroundColor = '#f5f5f5'
     osmWarning.style.borderLeft = '3px solid #ff9800'
-    osmWarning.innerHTML = `<strong>Avertissement :</strong> OSM étant collaboratif, la qualité varie selon les régions. Les zones urbaines des pays développés sont généralement très bien cartographiées, tandis que certaines zones rurales ou moins fréquentées peuvent être incomplètes ou obsolètes. Il est prudent de vérifier la fraîcheur des données pour votre zone d'intérêt et de croiser avec d'autres sources pour des applications critiques.`
+    osmWarning.innerHTML = `<strong>Avertissement :</strong> OSM étant collaboratif, les données, et parfois d’autant plus lorsqu’il s’agit de zones rurales ou moins fréquentées, peuvent être incomplètes ou pas à jour. Il est prudent d’apprécier la qualité et la fraîcheur des données pour votre zone d'intérêt il peut ainsi notamment être intéressant de croiser avec d’autres sources.`
 
     // --- Area autocomplete (for OSM) ---
     const label = DomUtil.element({ tagName: 'label', id: 'area', parent: container })
