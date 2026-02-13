@@ -75,7 +75,7 @@ Pour désactiver la protection, définissez `SIMPLE_PASSWORD_PROTECTION = None` 
 
 Les sources de données utilisées dans l'assistant d'import peuvent être définies dans le fichier de configuration `local_settings.py` d'uMap. Dans la variable `UMAP_IMPORTERS`, où il est possible de définir le label, la requête d'extraction des données, le format de ces données, ainsi que la source et une description de celles-ci.
 
-#### Données Importées
+#### Cas 1 : Données Importées
 
 Une partie des données ont été sélectionnées et prétraités pour répondre à notre cas d'usage. Pour importer ces données depuis umap, nous avons développé une API et son connecteur associé. **La documentation d'installation de l'API qui permet de fournir ces données, ainsi que la méthode pour ajouter de nouvelles données à celle-ci sont disponible dans le dépôt dédié : [Documentation API](https://github.com/datactivist/umap-data-api).**
 
@@ -98,7 +98,7 @@ Les données et leurs filtres seront automatiquement chargées au démarrage de 
 
 Attention : l’outil n’est pas un outil de géomatique, il ne permet pas de réaliser de géotraitement sur les données importées. Si vous souhaitez afficher des données comprenant une analyse, vous devez réaliser l’analyse en amont dans un logiciel du type QGis, travailler la symbologie et réaliser un export des données avec la symbologie intégrée pour ensuite l’importer dans le POC.
 
-#### Données extérieures
+#### Cas 2 : Données extérieures
 
 Plusieurs autres connecteurs sont également disponibles pour des sources de données différentes, comme les données Umap via l'API Overpass ou encore le contour des communes via le connecteur `cadastefr`.
 
