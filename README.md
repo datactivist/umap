@@ -75,7 +75,7 @@ Pour désactiver la protection, définissez `SIMPLE_PASSWORD_PROTECTION = None` 
 
 Les sources de données utilisées dans l'assistant d'import peuvent être définies dans le fichier de configuration `local_settings.py` d'uMap. Dans la variable `UMAP_IMPORTERS`, où il est possible de définir le label, la requête d'extraction des données, le format de ces données, ainsi que la source et une description de celles-ci.
 
-#### Cas 1 : Données Importées
+#### Cas 1 : Données Intégrées
 
 Une partie des données ont été sélectionnées et prétraités pour répondre à notre cas d'usage. Pour importer ces données depuis umap, nous avons développé une API et son connecteur associé. **La documentation d'installation de l'API qui permet de fournir ces données, ainsi que la méthode pour ajouter de nouvelles données à celle-ci sont disponible dans le dépôt dédié : [Documentation API](https://github.com/datactivist/umap-data-api).**
 
@@ -98,17 +98,56 @@ Les données et leurs filtres seront automatiquement chargées au démarrage de 
 
 Attention : l’outil n’est pas un outil de géomatique, il ne permet pas de réaliser de géotraitement sur les données importées. Si vous souhaitez afficher des données comprenant une analyse, vous devez réaliser l’analyse en amont dans un logiciel du type QGis, travailler la symbologie et réaliser un export des données avec la symbologie intégrée pour ensuite l’importer dans le POC.
 
-#### Cas 2 : Données extérieures
+Une fois les données intégrées à l'API, il suffit de les renseigner dans la variable `UMAP_IMPORTERS` : 
+```py
+UMAP_IMPORTERS = {
+    "datasets": {
+            "name": "Données vertes",
+            "choices": [
+                {
+                    "label": "Arbres (namR)",
+                    "data": "arbres", # Nom de la clé dans l'API
+                    "geographic_query": "commune", # Geographic filter in the API
+                    "format": "umap-data",
+                    "source": "https://www.data.gouv.fr/datasets/arbres-en-open-data-en-france-par-namr/",
+                    "description": "Ce jeu de données concerne l’ensemble des arbres urbains référencés dans l’open data.",
+                }
+            ],
+        },
+}
+```
 
-Plusieurs autres connecteurs sont également disponibles pour des sources de données différentes, comme les données Umap via l'API Overpass ou encore le contour des communes via le connecteur `cadastefr`.
+#### Cas 2 : Données Extérieures
+
+Plusieurs autres connecteurs sont également disponibles pour des sources de données différentes, comme les données OpenStreetMap via l'API Overpass ou encore le contour des communes via le connecteur `cadastefr`.
+
+Voici un exemple pour le connecteur de l'API Overpass :
+
+```py
+UMAP_IMPORTERS = {
+    "overpass": {"url": "https://overpass-api.de/api/interpreter"}, # Connecteur API "overpass" global
+
+    "datasets": { # Exemple de lien Externe OSM via "datasets"
+            "name": "Données vertes",
+            "choices": [
+                {
+                    "label": "Espaces verts — grass (OSM)",
+                    "expression": "nwr[landuse=grass];out geom;",
+                    "format": "osm",
+                    "source": "https://wiki.openstreetmap.org/wiki/Tag:landuse%3Dgrass",
+                }
+            ],
+        },
+}
+```
 
 Pour ajouter un connecteur à une API qui ne figure pas parmis ceux déjà supportées (**overpass, communesfr, cadastrefr, banfr, API du cas d'usage**), il est nécessaire de réaliser une **intégration spécifique** à la nouvelle API dans le code de uMap, en suivant la structure des intégrations existantes. Cela peut inclure la création d'une nouvelle classe d'importateur qui gère les requêtes à l'API et le formatage des données pour qu'elles soient compatibles avec uMap.
 
+
+
 #### Exemple de configuration
 
-Le fonctionnement au niveau de la configuration est donc sensiblement le même aussi bien pour les connecteurs d'API existants que pour celui que nous avons développé pour notre cas d'usage.
-
-Voici un exemple de configuration de la variable `UMAP_IMPORTERS`. Pour un exemple complet de la configuration utilisé dans le cadre du projet, veuillez vous référer au fichier `local_settings_example.py` à la racine du dépôt._
+Voici un exemple global de configuration de la variable `UMAP_IMPORTERS`. Pour un exemple complet de la configuration utilisé dans le cadre du projet, veuillez vous référer au fichier `local_settings_example.py` à la racine du dépôt._
 
 ```python
 UMAP_IMPORTERS = {
