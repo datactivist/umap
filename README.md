@@ -75,15 +75,40 @@ Pour désactiver la protection, définissez `SIMPLE_PASSWORD_PROTECTION = None` 
 
 Les sources de données utilisées dans l'assistant d'import peuvent être définies dans le fichier de configuration `local_settings.py` d'uMap. Dans la variable `UMAP_IMPORTERS`, où il est possible de définir le label, la requête d'extraction des données, le format de ces données, ainsi que la source et une description de celles-ci.
 
+#### Données Importées
+
 Une partie des données ont été sélectionnées et prétraités pour répondre à notre cas d'usage. Pour importer ces données depuis umap, nous avons développé une API et son connecteur associé. **La documentation d'installation de l'API qui permet de fournir ces données, ainsi que la méthode pour ajouter de nouvelles données à celle-ci sont disponible dans le dépôt dédié : [Documentation API](https://github.com/datactivist/umap-data-api).**
 
-Le fonctionnement au niveau de la configuration est donc le même aussi bien pour les connecteurs d'API existants que pour celui que nous avons développé pour notre cas d'usage.
+Voici les prétraitements nécessaires pour chaque source de données :
+
+- Les données doivent être découpées en fichiers GeoJSON par zone géographique (ex: région, département ou commune).
+- Le système de coordonnées doit être WGS 84 (EPSG:4326).
+- Les données doivent être au format GeoJSON valide.
+
+Pour ajouter ou modifier des sources de données, ajoutez les fichiers de source de données dans le répertoire `data/processed/` du **dépôt correspondant à l'API**.
+
+Le dossier doit être nommé ainsi : `data/processed/<source_name>/<source_name>_<geographic_filter>.geojson`
+
+Par exemple :
+
+- `data/processed/arbresnamr/arbresnamr_Toulouse.geojson`
+- `data/processed/arbresnamr/arbresnamr_Paris.geojson`
+
+Les données et leurs filtres seront automatiquement chargées au démarrage de l'application si le système de nommage est respecté. Dans l'exemple ci-dessus, le nom de la source est `arbresnamr` et les filtres géographiques disponibles sont `Toulouse` et `Paris`.
+
+Attention : l’outil n’est pas un outil de géomatique, il ne permet pas de réaliser de géotraitement sur les données importées. Si vous souhaitez afficher des données comprenant une analyse, vous devez réaliser l’analyse en amont dans un logiciel du type QGis, travailler la symbologie et réaliser un export des données avec la symbologie intégrée pour ensuite l’importer dans le POC.
+
+#### Données extérieures
+
+Plusieurs autres connecteurs sont également disponibles pour des sources de données différentes, comme les données Umap via l'API Overpass ou encore le contour des communes via le connecteur `cadastefr`.
 
 Pour ajouter un connecteur à une API qui ne figure pas parmis ceux déjà supportées (**overpass, communesfr, cadastrefr, banfr, API du cas d'usage**), il est nécessaire de réaliser une **intégration spécifique** à la nouvelle API dans le code de uMap, en suivant la structure des intégrations existantes. Cela peut inclure la création d'une nouvelle classe d'importateur qui gère les requêtes à l'API et le formatage des données pour qu'elles soient compatibles avec uMap.
 
+#### Exemple de configuration
 
+Le fonctionnement au niveau de la configuration est donc sensiblement le même aussi bien pour les connecteurs d'API existants que pour celui que nous avons développé pour notre cas d'usage.
 
-Voici un exemple de configuration de la variable `UMAP_IMPORTERS`. _Pour un exemple complet de la configuration utilisé dans le cadre du projet, veuillez vous référer au fichier `local_settings_example.py` à la racine du dépôt._
+Voici un exemple de configuration de la variable `UMAP_IMPORTERS`. Pour un exemple complet de la configuration utilisé dans le cadre du projet, veuillez vous référer au fichier `local_settings_example.py` à la racine du dépôt._
 
 ```python
 UMAP_IMPORTERS = {
